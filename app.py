@@ -1,7 +1,9 @@
+import os
+
 from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
-app.secret_key = 'change-me'  # replace with a real secret in production
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-only-change-me')
 
 
 # ---------- Discover ----------
