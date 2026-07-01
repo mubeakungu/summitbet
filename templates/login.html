@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Log in — Summit Stakes{% endblock %}
+
+{% block topactions %}
+  <a href="{{ url_for('register') }}" class="btn btn-ghost">Need an account?</a>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <h1>Welcome <span>back</span></h1>
+    <div class="sub">Log in to keep climbing.</div>
+
+    {% if error %}
+    <div class="error-banner">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="field">
+        <label for="phone">Phone number</label>
+        <input type="text" id="phone" name="phone" placeholder="07xx xxx xxx" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-gold">Log in</button>
+    </form>
+
+    <div class="login-foot">
+      New to Summit Stakes? <a href="{{ url_for('register') }}">Create an account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Summit Stakes{% endblock %}
+
+{% block topactions %}
+  <a href="{{ url_for('wallet') }}" class="btn btn-ghost">{{ user.username if user else 'Account' }}</a>
+  <a href="{{ url_for('logout') }}" class="btn btn-gold">Log out</a>
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="colmain">
+    <div class="crumb">Promotions</div>
+
+    <div class="hero">
+      <svg class="peak" viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="40,140 95,40 130,90 160,55 220,140" fill="#1F3D2E" opacity="0.8"/>
+        <polygon points="95,40 110,65 80,65" fill="#D9A441" opacity="0.85"/>
+        <polygon points="160,55 172,75 148,75" fill="#5FB3D9" opacity="0.6"/>
+      </svg>
+      <div class="hero-copy">
+        <div class="hero-eyebrow">Summit rewards</div>
+        <h1>Climb daily.<br>Earn <span>cashback.</span></h1>
+        <p>Every 24 hours your net play converts into real cashback &mdash; credited automatically, no wagering required.</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="label">Cashback rate</div><div class="value">Up to 12%</div></div>
+      <div class="stat"><div class="label">Paid out today</div><div class="value up">KSH 482,110</div></div>
+      <div class="stat"><div class="label">Active climbers</div><div class="value">3,204</div></div>
+    </div>
+
+    <div class="section-head">
+      <h2>Current promotions</h2>
+      <div class="more">View all</div>
+    </div>
+    <div class="promo-grid">
+      <div class="promo-card">
+        <span class="ribbon gold">Daily</span>
+        <h3>Base camp bonus</h3>
+        <p>First deposit each day unlocks a 10% top-up, credited instantly to your wallet.</p>
+      </div>
+      <div class="promo-card">
+        <span class="ribbon ice">Weekly</span>
+        <h3>Altitude streak</h3>
+        <p>Play three days in a row and your next cashback rate climbs a full tier.</p>
+      </div>
+      <div class="promo-card">
+        <span class="ribbon gold">New</span>
+        <h3>Summit referral</h3>
+        <p>Invite a friend &mdash; you both get a share of their first week's net deposits.</p>
+      </div>
+      <div class="promo-card">
+        <span class="ribbon ice">Ongoing</span>
+        <h3>Loss rebate</h3>
+        <p>Net losses over KSH 5,000 in a day return 8% automatically the next morning.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="colside">
+    <div class="panel">
+      <h3>Payment methods</h3>
+      <div class="pay-row"><span class="name">M-Pesa</span><span class="pay-tag">Instant</span></div>
+      <div class="pay-row"><span class="name">USDT (TRC20)</span><span class="pay-tag">Instant</span></div>
+      <div class="pay-row"><span class="name">Bank transfer</span><span class="pay-tag">~10 min</span></div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; align-items:center; margin-bottom:14px;">
+        <h3 style="margin:0;">Winners</h3>
+        <div class="ticker-live"><span class="pulse"></span>Live</div>
+      </div>
+      <div id="winnerList"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const names = ['254***925','254***769','254***441','254***908','254***317','254***602','254***184'];
+const games = ['Avrika','Aviator','JetX','Spin Peak','Crash X','Base Camp'];
+const colors = [
+  {bg:'rgba(217,164,65,0.18)', fg:'#D9A441'},
+  {bg:'rgba(95,179,217,0.18)', fg:'#5FB3D9'},
+  {bg:'rgba(63,174,122,0.18)', fg:'#3FAE7A'}
+];
+
+function randAmt(){ return (Math.random()*4000+200).toFixed(0); }
+function initials(g){ return g.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+function makeRow(){
+  const c = colors[Math.floor(Math.random()*colors.length)];
+  const g = games[Math.floor(Math.random()*games.length)];
+  const row = document.createElement('div');
+  row.className = 'winner-row';
+  row.innerHTML = `
+    <div class="winner-icon" style="background:${c.bg}; color:${c.fg};">${initials(g)}</div>
+    <div class="winner-info">
+      <div class="winner-id">${names[Math.floor(Math.random()*names.length)]}</div>
+      <div class="winner-amt">+KSH ${Number(randAmt()).toLocaleString()}</div>
+    </div>
+    <div class="winner-game">${g}</div>
+  `;
+  return row;
+}
+
+const list = document.getElementById('winnerList');
+for(let i=0;i<5;i++){ list.appendChild(makeRow()); }
+
+setInterval(()=>{
+  list.insertBefore(makeRow(), list.firstChild);
+  if(list.children.length > 6){ list.removeChild(list.lastChild); }
+}, 2600);
+</script>
+{% endblock %}

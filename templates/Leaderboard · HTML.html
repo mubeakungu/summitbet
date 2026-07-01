@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard — Summit Stakes{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="colmain">
+    <div class="crumb"><span class="back">&larr;</span> Leaderboard</div>
+
+    <div class="filter-row">
+      <span class="filter-chip active">This week</span>
+      <span class="filter-chip">This month</span>
+      <span class="filter-chip">All time</span>
+    </div>
+
+    <div class="panel">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Tier</th>
+            <th style="text-align:right;">Net winnings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in leaders %}
+          <tr>
+            <td class="lb-rank {% if loop.index == 1 %}top1{% elif loop.index == 2 %}top2{% elif loop.index == 3 %}top3{% endif %}">{{ loop.index }}</td>
+            <td>
+              <div class="lb-player">
+                <div class="lb-avatar">{{ row.initials }}</div>
+                <div class="lb-id">{{ row.masked_id }}</div>
+              </div>
+            </td>
+            <td><span class="lb-tier">{{ row.tier }}</span></td>
+            <td class="lb-amt">KSH {{ '{:,}'.format(row.amount) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="colside">
+    <div class="panel">
+      <h3>Payment methods</h3>
+      <div class="pay-row"><span class="name">M-Pesa</span><span class="pay-tag">Instant</span></div>
+      <div class="pay-row"><span class="name">USDT (TRC20)</span><span class="pay-tag">Instant</span></div>
+      <div class="pay-row"><span class="name">Bank transfer</span><span class="pay-tag">~10 min</span></div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; align-items:center; margin-bottom:14px;">
+        <h3 style="margin:0;">Winners</h3>
+        <div class="ticker-live"><span class="pulse"></span>Live</div>
+      </div>
+      <div id="winnerList"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const names = ['254***925','254***769','254***441','254***908','254***317','254***602','254***184'];
+const games = ['Avrika','Aviator','JetX','Spin Peak','Crash X','Base Camp'];
+const colors = [
+  {bg:'rgba(217,164,65,0.18)', fg:'#D9A441'},
+  {bg:'rgba(95,179,217,0.18)', fg:'#5FB3D9'},
+  {bg:'rgba(63,174,122,0.18)', fg:'#3FAE7A'}
+];
+
+function randAmt(){ return (Math.random()*4000+200).toFixed(0); }
+function initials(g){ return g.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+function makeRow(){
+  const c = colors[Math.floor(Math.random()*colors.length)];
+  const g = games[Math.floor(Math.random()*games.length)];
+  const row = document.createElement('div');
+  row.className = 'winner-row';
+  row.innerHTML = `
+    <div class="winner-icon" style="background:${c.bg}; color:${c.fg};">${initials(g)}</div>
+    <div class="winner-info">
+      <div class="winner-id">${names[Math.floor(Math.random()*names.length)]}</div>
+      <div class="winner-amt">+KSH ${Number(randAmt()).toLocaleString()}</div>
+    </div>
+    <div class="winner-game">${g}</div>
+  `;
+  return row;
+}
+
+const list = document.getElementById('winnerList');
+for(let i=0;i<5;i++){ list.appendChild(makeRow()); }
+
+setInterval(()=>{
+  list.insertBefore(makeRow(), list.firstChild);
+  if(list.children.length > 6){ list.removeChild(list.lastChild); }
+}, 2600);
+</script>
+{% endblock %}

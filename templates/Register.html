@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Register — Summit Stakes{% endblock %}
+
+{% block topactions %}
+  <a href="{{ url_for('login') }}" class="btn btn-ghost">Already have an account?</a>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <h1>Create your <span>account</span></h1>
+    <div class="sub">Start climbing in under a minute.</div>
+
+    {% if error %}
+    <div class="error-banner">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('register') }}">
+      <div class="field">
+        <label for="full_name">Full name</label>
+        <input type="text" id="full_name" name="full_name" placeholder="Jane Wanjiru" required>
+      </div>
+      <div class="field">
+        <label for="phone">Phone number</label>
+        <input type="text" id="phone" name="phone" placeholder="07xx xxx xxx" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required>
+      </div>
+      <div class="field">
+        <label for="confirm_password">Confirm password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" required>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">I confirm I am 18 years or older and agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Responsible Gambling Policy</a>.</label>
+      </div>
+
+      <button type="submit" class="btn btn-gold">Create account</button>
+    </form>
+
+    <div class="login-foot">
+      Already registered? <a href="{{ url_for('login') }}">Log in</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

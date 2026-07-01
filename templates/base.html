@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Summit Stakes{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/summit.css') }}">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="frame">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark"></div>
+      <div>
+        <div class="name">SUMMIT<span>STAKES</span></div>
+        <div class="tag">Reach the peak</div>
+      </div>
+    </div>
+
+    <div class="navlabel">Discover</div>
+    <a href="{{ url_for('dashboard') }}" class="navitem {% if active_nav == 'promotions' %}active{% endif %}"><span class="dot"></span>Promotions</a>
+    <a href="{{ url_for('top_games') }}" class="navitem {% if active_nav == 'top_games' %}active{% endif %}"><span class="dot"></span>Top games</a>
+    <a href="{{ url_for('leaderboard') }}" class="navitem {% if active_nav == 'leaderboard' %}active{% endif %}"><span class="dot"></span>Leaderboard</a>
+
+    <div class="navlabel">Play</div>
+    <a href="{{ url_for('crash_games') }}" class="navitem {% if active_nav == 'crash_games' %}active{% endif %}"><span class="dot"></span>Crash games</a>
+    <a href="{{ url_for('slots') }}" class="navitem {% if active_nav == 'slots' %}active{% endif %}"><span class="dot"></span>Slots</a>
+    <a href="{{ url_for('live_tables') }}" class="navitem {% if active_nav == 'live_tables' %}active{% endif %}"><span class="dot"></span>Live tables</a>
+    <a href="{{ url_for('sportsbook') }}" class="navitem {% if active_nav == 'sportsbook' %}active{% endif %}"><span class="dot"></span>Sportsbook</a>
+    <a href="{{ url_for('instant_win') }}" class="navitem {% if active_nav == 'instant_win' %}active{% endif %}"><span class="dot"></span>Instant win</a>
+
+    <div class="navlabel">Account</div>
+    <a href="{{ url_for('wallet') }}" class="navitem {% if active_nav == 'wallet' %}active{% endif %}"><span class="dot"></span>Wallet</a>
+    <a href="{{ url_for('history') }}" class="navitem {% if active_nav == 'history' %}active{% endif %}"><span class="dot"></span>History</a>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <input class="search" placeholder="Search games, providers...">
+      <div class="topactions">
+        {% block topactions %}
+          <a href="{{ url_for('login') }}" class="btn btn-ghost">Log in</a>
+          <a href="{{ url_for('register') }}" class="btn btn-gold">Register</a>
+        {% endblock %}
+      </div>
+    </div>
+
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

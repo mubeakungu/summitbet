@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Slots — Summit Stakes{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="colmain">
+    <div class="crumb"><span class="back">&larr;</span> Slots</div>
+
+    <div class="filter-row">
+      <span class="filter-chip active">All providers</span>
+      <span class="filter-chip">Pragmatic Play</span>
+      <span class="filter-chip">BGaming</span>
+      <span class="filter-chip">Summit Originals</span>
+    </div>
+
+    <div class="games-grid">
+      {% for game in games %}
+      <div class="game-card">
+        <div class="game-thumb" style="background:{{ game.color }};">
+          {{ game.initials }}
+          {% if game.hot %}<span class="hot">Hot</span>{% endif %}
+        </div>
+        <div class="game-meta">
+          <div class="gname">{{ game.name }}</div>
+          <div class="gprovider">{{ game.provider }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="colside">
+    <div class="panel">
+      <h3>Payment methods</h3>
+      <div class="pay-row"><span class="name">M-Pesa</span><span class="pay-tag">Instant</span></div>
+      <div class="pay-row"><span class="name">USDT (TRC20)</span><span class="pay-tag">Instant</span></div>
+      <div class="pay-row"><span class="name">Bank transfer</span><span class="pay-tag">~10 min</span></div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; align-items:center; margin-bottom:14px;">
+        <h3 style="margin:0;">Winners</h3>
+        <div class="ticker-live"><span class="pulse"></span>Live</div>
+      </div>
+      <div id="winnerList"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const names = ['254***925','254***769','254***441','254***908','254***317','254***602','254***184'];
+const games = ['Avrika','Aviator','JetX','Spin Peak','Crash X','Base Camp'];
+const colors = [
+  {bg:'rgba(217,164,65,0.18)', fg:'#D9A441'},
+  {bg:'rgba(95,179,217,0.18)', fg:'#5FB3D9'},
+  {bg:'rgba(63,174,122,0.18)', fg:'#3FAE7A'}
+];
+
+function randAmt(){ return (Math.random()*4000+200).toFixed(0); }
+function initials(g){ return g.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+function makeRow(){
+  const c = colors[Math.floor(Math.random()*colors.length)];
+  const g = games[Math.floor(Math.random()*games.length)];
+  const row = document.createElement('div');
+  row.className = 'winner-row';
+  row.innerHTML = `
+    <div class="winner-icon" style="background:${c.bg}; color:${c.fg};">${initials(g)}</div>
+    <div class="winner-info">
+      <div class="winner-id">${names[Math.floor(Math.random()*names.length)]}</div>
+      <div class="winner-amt">+KSH ${Number(randAmt()).toLocaleString()}</div>
+    </div>
+    <div class="winner-game">${g}</div>
+  `;
+  return row;
+}
+
+const list = document.getElementById('winnerList');
+for(let i=0;i<5;i++){ list.appendChild(makeRow()); }
+
+setInterval(()=>{
+  list.insertBefore(makeRow(), list.firstChild);
+  if(list.children.length > 6){ list.removeChild(list.lastChild); }
+}, 2600);
+</script>
+{% endblock %}
