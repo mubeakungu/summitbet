@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found — Summit Stakes{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card" style="text-align:center; max-width:420px;">
+    <div style="font-family:'Barlow Condensed'; font-weight:700; font-size:72px; color:var(--gold); line-height:1;">404</div>
+    <h1 style="margin-top:10px;">Lost the <span>trail</span></h1>
+    <div class="sub" style="margin-bottom:26px;">That page doesn't exist, or it's moved further up the mountain.</div>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-gold" style="display:block; text-align:center; text-decoration:none;">Back to dashboard</a>
+  </div>
+</div>
+{% endblock %}
