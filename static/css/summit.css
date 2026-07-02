@@ -260,6 +260,66 @@ body{
 .checkbox-row label{font-size:12.5px; color:var(--text-dim); line-height:1.5;}
 .checkbox-row label a{color:var(--gold); text-decoration:none;}
 
+/* ---- deposit/withdraw modal (new) ---- */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(5,8,12,0.7);
+  display:none; align-items:center; justify-content:center; z-index:50;
+}
+.modal-overlay.open{display:flex;}
+.modal-box{
+  width:100%; max-width:400px;
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  padding:26px 26px 22px;
+}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.modal-head h3{font-family:'Barlow Condensed'; font-weight:600; font-size:19px;}
+.modal-close{
+  width:26px; height:26px; border-radius:6px; background:var(--panel-2);
+  border:1px solid var(--line); color:var(--text-dim); cursor:pointer;
+  font-size:14px; display:flex; align-items:center; justify-content:center;
+}
+.method-tabs{display:flex; gap:8px; margin-bottom:18px;}
+.method-tab{
+  flex:1; text-align:center; padding:9px 0; border-radius:6px;
+  font-size:12.5px; font-weight:500; color:var(--text-dim);
+  border:1px solid var(--line); background:var(--panel-2); cursor:pointer;
+}
+.method-tab.active{border-color:var(--gold); color:var(--gold); background:rgba(217,164,65,0.1);}
+.modal-note{
+  font-size:12px; color:var(--text-faint); margin-top:-6px; margin-bottom:16px; line-height:1.5;
+}
+.modal-box .btn-gold{width:100%; text-align:center; padding:11px 0; font-size:14px; border:none; cursor:pointer;}
+.quick-amts{display:flex; gap:8px; margin-bottom:16px;}
+.quick-amt{
+  flex:1; text-align:center; padding:8px 0; border-radius:6px;
+  font-size:12.5px; color:var(--text-dim); border:1px solid var(--line);
+  background:var(--panel-2); cursor:pointer;
+}
+.quick-amt:hover{border-color:var(--gold); color:var(--gold);}
+
+/* ---- bet slip (new) ---- */
+.odds-btn.selected{border-color:var(--gold); background:rgba(217,164,65,0.15); color:var(--gold);}
+.slip-empty{font-size:12.5px; color:var(--text-faint); text-align:center; padding:18px 0;}
+.slip-item{
+  padding:10px 0; border-bottom:1px solid var(--line);
+}
+.slip-item:last-child{border-bottom:none;}
+.slip-item-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
+.slip-item .match{font-size:12px; color:var(--text-faint); margin-bottom:2px;}
+.slip-item .pick{font-size:13px; font-weight:600;}
+.slip-item .odds{font-size:13px; font-family:'JetBrains Mono'; color:var(--gold); flex-shrink:0;}
+.slip-remove{
+  background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:15px;
+  line-height:1; padding:0 0 0 8px;
+}
+.slip-remove:hover{color:var(--fall);}
+.slip-stake{margin-top:14px;}
+.slip-totals{margin-top:12px; font-size:12.5px; color:var(--text-dim); display:flex; justify-content:space-between; padding:4px 0;}
+.slip-totals strong{color:var(--text); font-family:'JetBrains Mono';}
+.slip-note{font-size:11px; color:var(--text-faint); margin-top:10px; line-height:1.5;}
+
+
+
 
 /* ---- games grid (new) ---- */
 .filter-row{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
