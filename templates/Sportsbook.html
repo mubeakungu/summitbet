@@ -29,9 +29,9 @@
           <div class="t2">{{ fx.away }}</div>
         </div>
         <div class="fixture-odds">
-          <div class="odds-btn"><span class="lbl">1</span>{{ fx.odds_home }}</div>
-          <div class="odds-btn"><span class="lbl">X</span>{{ fx.odds_draw }}</div>
-          <div class="odds-btn"><span class="lbl">2</span>{{ fx.odds_away }}</div>
+          <div class="odds-btn" data-match="{{ fx.home }} vs {{ fx.away }}" data-pick="{{ fx.home }}" data-odds="{{ fx.odds_home }}" onclick="toggleSelection(this)"><span class="lbl">1</span>{{ fx.odds_home }}</div>
+          <div class="odds-btn" data-match="{{ fx.home }} vs {{ fx.away }}" data-pick="Draw" data-odds="{{ fx.odds_draw }}" onclick="toggleSelection(this)"><span class="lbl">X</span>{{ fx.odds_draw }}</div>
+          <div class="odds-btn" data-match="{{ fx.home }} vs {{ fx.away }}" data-pick="{{ fx.away }}" data-odds="{{ fx.odds_away }}" onclick="toggleSelection(this)"><span class="lbl">2</span>{{ fx.odds_away }}</div>
         </div>
       </div>
       {% endfor %}
@@ -40,6 +40,23 @@
   </div>
 
   <div class="colside">
+    <div class="panel">
+      <h3>Bet slip</h3>
+      <div id="slipItems">
+        <div class="slip-empty" id="slipEmpty">Tap any odds to add a selection.</div>
+      </div>
+      <div class="slip-stake" id="slipStakeWrap" style="display:none;">
+        <div class="field" style="margin-bottom:8px;">
+          <label for="slipStake">Stake (KSH)</label>
+          <input type="text" id="slipStake" placeholder="0" oninput="updateSlipTotals()">
+        </div>
+        <div class="slip-totals"><span>Total odds</span><strong id="slipTotalOdds">0.00</strong></div>
+        <div class="slip-totals"><span>Potential payout</span><strong id="slipPayout">KSH 0</strong></div>
+        <button class="btn-gold" style="width:100%; margin-top:12px; border:none; padding:10px 0; cursor:pointer;" onclick="placeBetPlaceholder()">Place bet</button>
+        <div class="slip-note">Bet placement isn't connected to a real wallet or odds feed yet — this slip is for UI only.</div>
+      </div>
+    </div>
+
     <div class="panel">
       <h3>Payment methods</h3>
       <div class="pay-row"><span class="name">M-Pesa</span><span class="pay-tag">Instant</span></div>
@@ -94,5 +111,78 @@ setInterval(()=>{
   list.insertBefore(makeRow(), list.firstChild);
   if(list.children.length > 6){ list.removeChild(list.lastChild); }
 }, 2600);
+
+/* ---- bet slip ---- */
+let selections = [];
+
+function toggleSelection(el){
+  const match = el.dataset.match;
+  const pick = el.dataset.pick;
+  const odds = parseFloat(el.dataset.odds);
+
+  const existingIdx = selections.findIndex(s => s.match === match);
+
+  if (el.classList.contains('selected')) {
+    // deselect this exact button
+    selections = selections.filter(s => s.match !== match);
+    el.classList.remove('selected');
+  } else {
+    // clear any other pick on the same match, select this one
+    document.querySelectorAll(`.odds-btn[data-match="${CSS.escape(match)}"]`).forEach(b => b.classList.remove('selected'));
+    if (existingIdx > -1) selections.splice(existingIdx, 1);
+    selections.push({ match, pick, odds });
+    el.classList.add('selected');
+  }
+  renderSlip();
+}
+
+function renderSlip(){
+  const container = document.getElementById('slipItems');
+  const stakeWrap = document.getElementById('slipStakeWrap');
+
+  if (selections.length === 0) {
+    container.innerHTML = '<div class="slip-empty" id="slipEmpty">Tap any odds to add a selection.</div>';
+    stakeWrap.style.display = 'none';
+    return;
+  }
+
+  stakeWrap.style.display = 'block';
+  container.innerHTML = selections.map((s, i) => `
+    <div class="slip-item">
+      <div class="slip-item-top">
+        <div>
+          <div class="match">${s.match}</div>
+          <div class="pick">${s.pick}</div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="odds">${s.odds.toFixed(2)}</span>
+          <button class="slip-remove" onclick="removeSelection(${i})">&times;</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  updateSlipTotals();
+}
+
+function removeSelection(idx){
+  const removed = selections[idx];
+  selections.splice(idx, 1);
+  document.querySelectorAll(`.odds-btn[data-match="${CSS.escape(removed.match)}"][data-pick="${CSS.escape(removed.pick)}"]`)
+    .forEach(b => b.classList.remove('selected'));
+  renderSlip();
+}
+
+function updateSlipTotals(){
+  const stake = parseFloat(document.getElementById('slipStake').value) || 0;
+  const totalOdds = selections.reduce((acc, s) => acc * s.odds, 1);
+  document.getElementById('slipTotalOdds').textContent = selections.length ? totalOdds.toFixed(2) : '0.00';
+  document.getElementById('slipPayout').textContent = 'KSH ' + Math.round(stake * totalOdds).toLocaleString();
+}
+
+function placeBetPlaceholder(){
+  alert('Bet placement is not wired to a backend yet — no wager has been recorded.');
+}
+
 </script>
 {% endblock %}
