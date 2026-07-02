@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Wallet — Summit Stakes{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="colmain">
+    <div class="crumb"><span class="back">&larr;</span> Wallet</div>
+
+    <div class="balance-card">
+      <div class="balance-eyebrow">Available balance</div>
+      <div class="balance-amt">KSH {{ '{:,.2f}'.format(balance) }}</div>
+      <div class="balance-actions">
+        <button class="btn btn-gold" onclick="openModal('depositModal')">Deposit</button>
+        <button class="btn btn-ghost" onclick="openModal('withdrawModal')">Withdraw</button>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Recent transactions</h2>
+      <div class="more">View all</div>
+    </div>
+    <div class="panel">
+      {% for tx in transactions %}
+      <div class="tx-row">
+        <div class="tx-icon {{ 'in' if tx.direction == 'in' else 'out' }}">
+          {{ '↓' if tx.direction == 'in' else '↑' }}
+        </div>
+        <div class="tx-info">
+          <div class="tx-label">{{ tx.label }}</div>
+          <div class="tx-date">{{ tx.date }} &middot; {{ tx.method }}</div>
+        </div>
+        <div class="tx-amt {{ 'in' if tx.direction == 'in' else 'out' }}">
+          {{ '+' if tx.direction == 'in' else '-' }}KSH {{ '{:,}'.format(tx.amount) }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="colside">
+    <div class="panel">
+      <h3>Payment methods</h3>
+      <div class="pay-row"><span class="name">M-Pesa</span><span class="pay-tag">Instant</span></div>
+      <div class="pay-row"><span class="name">USDT (TRC20)</span><span class="pay-tag">Instant</span></div>
+      <div class="pay-row"><span class="name">Bank transfer</span><span class="pay-tag">~10 min</span></div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; align-items:center; margin-bottom:14px;">
+        <h3 style="margin:0;">Winners</h3>
+        <div class="ticker-live"><span class="pulse"></span>Live</div>
+      </div>
+      <div id="winnerList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ---- Deposit modal ---- -->
+<div class="modal-overlay" id="depositModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Deposit funds</h3>
+      <button class="modal-close" onclick="closeModal('depositModal')">&times;</button>
+    </div>
+
+    <div class="method-tabs">
+      <div class="method-tab active" data-target="dep-mpesa" onclick="switchTab(this, 'dep-mpesa')">M-Pesa</div>
+      <div class="method-tab" data-target="dep-usdt" onclick="switchTab(this, 'dep-usdt')">USDT</div>
+      <div class="method-tab" data-target="dep-bank" onclick="switchTab(this, 'dep-bank')">Bank</div>
+    </div>
+
+    <form method="POST" action="{{ url_for('wallet_deposit') }}">
+      <div id="dep-mpesa" class="method-pane">
+        <div class="field">
+          <label for="dep_phone">M-Pesa phone number</label>
+          <input type="text" id="dep_phone" name="phone" placeholder="07xx xxx xxx">
+        </div>
+        <div class="field">
+          <label for="dep_amount_mpesa">Amount (KSH)</label>
+          <input type="text" id="dep_amount_mpesa" name="amount" placeholder="0">
+        </div>
+        <div class="quick-amts">
+          <div class="quick-amt" onclick="setAmt('dep_amount_mpesa', 100)">100</div>
+          <div class="quick-amt" onclick="setAmt('dep_amount_mpesa', 500)">500</div>
+          <div class="quick-amt" onclick="setAmt('dep_amount_mpesa', 1000)">1,000</div>
+          <div class="quick-amt" onclick="setAmt('dep_amount_mpesa', 5000)">5,000</div>
+        </div>
+        <div class="modal-note">You'll get an STK push prompt on your phone to enter your M-Pesa PIN.</div>
+      </div>
+
+      <div id="dep-usdt" class="method-pane" style="display:none;">
+        <div class="modal-note">Send USDT (TRC20 network only) to the address below. Your wallet is credited after 1 network confirmation.</div>
+        <div class="field">
+          <label for="dep_usdt_addr">Deposit address</label>
+          <input type="text" id="dep_usdt_addr" value="TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" readonly>
+        </div>
+      </div>
+
+      <div id="dep-bank" class="method-pane" style="display:none;">
+        <div class="field">
+          <label for="dep_amount_bank">Amount (KSH)</label>
+          <input type="text" id="dep_amount_bank" name="bank_amount" placeholder="0">
+        </div>
+        <div class="modal-note">Bank transfers are matched to your account automatically and usually clear in ~10 minutes.</div>
+      </div>
+
+      <input type="hidden" name="method" id="dep_method" value="mpesa">
+      <button type="submit" class="btn-gold">Continue</button>
+    </form>
+  </div>
+</div>
+
+<!-- ---- Withdraw modal ---- -->
+<div class="modal-overlay" id="withdrawModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Withdraw funds</h3>
+      <button class="modal-close" onclick="closeModal('withdrawModal')">&times;</button>
+    </div>
+
+    <div class="method-tabs">
+      <div class="method-tab active" data-target="wd-mpesa" onclick="switchTab(this, 'wd-mpesa')">M-Pesa</div>
+      <div class="method-tab" data-target="wd-usdt" onclick="switchTab(this, 'wd-usdt')">USDT</div>
+    </div>
+
+    <form method="POST" action="{{ url_for('wallet_withdraw') }}">
+      <div id="wd-mpesa" class="method-pane">
+        <div class="field">
+          <label for="wd_phone">M-Pesa phone number</label>
+          <input type="text" id="wd_phone" name="phone" placeholder="07xx xxx xxx">
+        </div>
+        <div class="field">
+          <label for="wd_amount_mpesa">Amount (KSH)</label>
+          <input type="text" id="wd_amount_mpesa" name="amount" placeholder="0">
+        </div>
+      </div>
+
+      <div id="wd-usdt" class="method-pane" style="display:none;">
+        <div class="field">
+          <label for="wd_usdt_addr">Your USDT (TRC20) address</label>
+          <input type="text" id="wd_usdt_addr" name="usdt_address" placeholder="T...">
+        </div>
+        <div class="field">
+          <label for="wd_amount_usdt">Amount (USDT)</label>
+          <input type="text" id="wd_amount_usdt" name="usdt_amount" placeholder="0">
+        </div>
+      </div>
+
+      <div class="modal-note">Available balance: KSH {{ '{:,.2f}'.format(balance) }}</div>
+      <input type="hidden" name="method" id="wd_method" value="mpesa">
+      <button type="submit" class="btn-gold">Request withdrawal</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const names = ['254***925','254***769','254***441','254***908','254***317','254***602','254***184'];
+const games = ['Avrika','Aviator','JetX','Spin Peak','Crash X','Base Camp'];
+const colors = [
+  {bg:'rgba(217,164,65,0.18)', fg:'#D9A441'},
+  {bg:'rgba(95,179,217,0.18)', fg:'#5FB3D9'},
+  {bg:'rgba(63,174,122,0.18)', fg:'#3FAE7A'}
+];
+
+function randAmt(){ return (Math.random()*4000+200).toFixed(0); }
+function initials(g){ return g.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+function makeRow(){
+  const c = colors[Math.floor(Math.random()*colors.length)];
+  const g = games[Math.floor(Math.random()*games.length)];
+  const row = document.createElement('div');
+  row.className = 'winner-row';
+  row.innerHTML = `
+    <div class="winner-icon" style="background:${c.bg}; color:${c.fg};">${initials(g)}</div>
+    <div class="winner-info">
+      <div class="winner-id">${names[Math.floor(Math.random()*names.length)]}</div>
+      <div class="winner-amt">+KSH ${Number(randAmt()).toLocaleString()}</div>
+    </div>
+    <div class="winner-game">${g}</div>
+  `;
+  return row;
+}
+
+const list = document.getElementById('winnerList');
+for(let i=0;i<5;i++){ list.appendChild(makeRow()); }
+
+setInterval(()=>{
+  list.insertBefore(makeRow(), list.firstChild);
+  if(list.children.length > 6){ list.removeChild(list.lastChild); }
+}, 2600);
+
+/* ---- deposit/withdraw modal behavior ---- */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+function switchTab(tabEl, targetId){
+  const group = tabEl.parentElement;
+  group.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+
+  const form = group.closest('.modal-box').querySelector('form');
+  form.querySelectorAll('.method-pane').forEach(p => p.style.display = 'none');
+  document.getElementById(targetId).style.display = 'block';
+
+  const hiddenInput = form.querySelector('input[name="method"]');
+  if (hiddenInput) hiddenInput.value = targetId.split('-')[1];
+}
+
+function setAmt(inputId, val){
+  document.getElementById(inputId).value = val;
+}
+
+</script>
+{% endblock %}
