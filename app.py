@@ -235,5 +235,15 @@ def wallet_withdraw():
     return redirect(url_for('wallet'))
 
 
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html', active_nav=None, user=session.get('user')), 404
+
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html', active_nav=None, user=session.get('user')), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
