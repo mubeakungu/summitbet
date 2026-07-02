@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-only-change-me')
@@ -208,6 +208,31 @@ def register():
         return render_template('register.html', error='Please fill in all fields.')
 
     return render_template('register.html')
+
+
+@app.route('/wallet/deposit', methods=['POST'])
+def wallet_deposit():
+    # PLACEHOLDER ONLY — no payment gateway is wired up yet.
+    # A real implementation needs, at minimum:
+    #   - M-Pesa: Safaricom Daraja STK Push API call, then a callback endpoint
+    #     that verifies the payment and credits the wallet server-side
+    #   - USDT: a per-user deposit address + blockchain confirmation listener
+    #   - Bank: reconciliation against your bank's transaction feed
+    # None of that exists here. This just confirms the form submitted correctly.
+    method = request.form.get('method', 'mpesa')
+    flash(f'Deposit request received via {method.upper()}. Payment processing is not yet connected.', 'success')
+    return redirect(url_for('wallet'))
+
+
+@app.route('/wallet/withdraw', methods=['POST'])
+def wallet_withdraw():
+    # PLACEHOLDER ONLY — same caveat as wallet_deposit(). A real withdrawal flow
+    # needs server-side balance verification, fraud/AML checks, and an actual
+    # payout call (Daraja B2C for M-Pesa, a signed on-chain transfer for USDT)
+    # before the wallet balance is ever decremented.
+    method = request.form.get('method', 'mpesa')
+    flash(f'Withdrawal request received via {method.upper()}. Payout processing is not yet connected.', 'success')
+    return redirect(url_for('wallet'))
 
 
 if __name__ == '__main__':
