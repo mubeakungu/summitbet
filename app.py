@@ -5,6 +5,26 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-only-change-me')
 
+# ---------- Master games catalog ----------
+# TODO: replace with a real query against your games table. This is the single
+# source of truth for every game card across Top games / Slots / Crash games.
+GAMES = [
+    {'slug': 'aviator', 'name': 'Aviator', 'provider': 'Spribe', 'initials': 'AV', 'color': '#1F3D2E', 'category': 'crash', 'hot': True},
+    {'slug': 'jetx', 'name': 'JetX', 'provider': 'SmartSoft', 'initials': 'JX', 'color': '#14211B', 'category': 'crash', 'hot': True},
+    {'slug': 'spin-peak', 'name': 'Spin Peak', 'provider': 'Summit Originals', 'initials': 'SP', 'color': '#1B1306', 'category': 'crash', 'hot': False},
+    {'slug': 'crash-x', 'name': 'Crash X', 'provider': 'BGaming', 'initials': 'CX', 'color': '#0F2A28', 'category': 'crash', 'hot': False},
+    {'slug': 'base-camp', 'name': 'Base Camp', 'provider': 'Summit Originals', 'initials': 'BC', 'color': '#1F3D2E', 'category': 'crash', 'hot': False},
+    {'slug': 'ice-peak', 'name': 'Ice Peak', 'provider': 'Spribe', 'initials': 'IP', 'color': '#1B1306', 'category': 'crash', 'hot': True},
+    {'slug': 'gold-rush', 'name': 'Gold Rush', 'provider': 'Pragmatic Play', 'initials': 'GR', 'color': '#14211B', 'category': 'slot', 'hot': True},
+    {'slug': 'wolf-gold', 'name': 'Wolf Gold', 'provider': 'Pragmatic Play', 'initials': 'WG', 'color': '#0F2A28', 'category': 'slot', 'hot': False},
+    {'slug': 'sweet-bonanza', 'name': 'Sweet Bonanza', 'provider': 'Pragmatic Play', 'initials': 'SB', 'color': '#1B1306', 'category': 'slot', 'hot': True},
+    {'slug': 'fire-peak', 'name': 'Fire Peak', 'provider': 'Summit Originals', 'initials': 'FP', 'color': '#1F3D2E', 'category': 'slot', 'hot': False},
+    {'slug': 'diamond-rift', 'name': 'Diamond Rift', 'provider': 'BGaming', 'initials': 'DR', 'color': '#14211B', 'category': 'slot', 'hot': False},
+    {'slug': 'book-of-ridge', 'name': 'Book of Ridge', 'provider': 'BGaming', 'initials': 'BR', 'color': '#0F2A28', 'category': 'slot', 'hot': False},
+    {'slug': 'lucky-slopes', 'name': 'Lucky Slopes', 'provider': 'Summit Originals', 'initials': 'LS', 'color': '#1B1306', 'category': 'slot', 'hot': False},
+    {'slug': 'sugar-rush', 'name': 'Sugar Rush', 'provider': 'Pragmatic Play', 'initials': 'SR', 'color': '#1F3D2E', 'category': 'slot', 'hot': False},
+]
+
 
 # ---------- Discover ----------
 
@@ -16,18 +36,7 @@ def dashboard():
 
 @app.route('/top-games')
 def top_games():
-    # TODO: replace with a real query against your games table
-    games = [
-        {'name': 'Aviator', 'provider': 'Spribe', 'initials': 'AV', 'color': '#1F3D2E', 'hot': True},
-        {'name': 'JetX', 'provider': 'SmartSoft', 'initials': 'JX', 'color': '#14211B', 'hot': True},
-        {'name': 'Spin Peak', 'provider': 'Summit Originals', 'initials': 'SP', 'color': '#1B1306', 'hot': False},
-        {'name': 'Crash X', 'provider': 'BGaming', 'initials': 'CX', 'color': '#0F2A28', 'hot': False},
-        {'name': 'Base Camp', 'provider': 'Summit Originals', 'initials': 'BC', 'color': '#1F3D2E', 'hot': False},
-        {'name': 'Gold Rush', 'provider': 'Pragmatic Play', 'initials': 'GR', 'color': '#14211B', 'hot': False},
-        {'name': 'Ice Peak', 'provider': 'Spribe', 'initials': 'IP', 'color': '#1B1306', 'hot': True},
-        {'name': 'Wolf Gold', 'provider': 'Pragmatic Play', 'initials': 'WG', 'color': '#0F2A28', 'hot': False},
-    ]
-    return render_template('top_games.html', active_nav='top_games', games=games, user=session.get('user'))
+    return render_template('top_games.html', active_nav='top_games', games=GAMES, user=session.get('user'))
 
 
 @app.route('/leaderboard')
@@ -49,29 +58,13 @@ def leaderboard():
 
 @app.route('/crash-games')
 def crash_games():
-    # TODO: replace with a real query against your games table filtered to category='crash'
-    games = [
-        {'name': 'JetX', 'provider': 'SmartSoft', 'initials': 'JX', 'color': '#14211B', 'hot': True},
-        {'name': 'Spin Peak', 'provider': 'Summit Originals', 'initials': 'SP', 'color': '#1B1306', 'hot': False},
-        {'name': 'Crash X', 'provider': 'BGaming', 'initials': 'CX', 'color': '#0F2A28', 'hot': False},
-        {'name': 'Base Camp', 'provider': 'Summit Originals', 'initials': 'BC', 'color': '#1F3D2E', 'hot': False},
-    ]
+    games = [g for g in GAMES if g['category'] == 'crash']
     return render_template('crash_games.html', active_nav='crash_games', games=games, user=session.get('user'))
 
 
 @app.route('/slots')
 def slots():
-    # TODO: replace with a real query against your games table filtered to category='slots'
-    games = [
-        {'name': 'Gold Rush', 'provider': 'Pragmatic Play', 'initials': 'GR', 'color': '#14211B', 'hot': True},
-        {'name': 'Wolf Gold', 'provider': 'Pragmatic Play', 'initials': 'WG', 'color': '#0F2A28', 'hot': False},
-        {'name': 'Sweet Bonanza', 'provider': 'Pragmatic Play', 'initials': 'SB', 'color': '#1B1306', 'hot': True},
-        {'name': 'Fire Peak', 'provider': 'Summit Originals', 'initials': 'FP', 'color': '#1F3D2E', 'hot': False},
-        {'name': 'Diamond Rift', 'provider': 'BGaming', 'initials': 'DR', 'color': '#14211B', 'hot': False},
-        {'name': 'Book of Ridge', 'provider': 'BGaming', 'initials': 'BR', 'color': '#0F2A28', 'hot': False},
-        {'name': 'Lucky Slopes', 'provider': 'Summit Originals', 'initials': 'LS', 'color': '#1B1306', 'hot': False},
-        {'name': 'Sugar Rush', 'provider': 'Pragmatic Play', 'initials': 'SR', 'color': '#1F3D2E', 'hot': False},
-    ]
+    games = [g for g in GAMES if g['category'] == 'slot']
     return render_template('slots.html', active_nav='slots', games=games, user=session.get('user'))
 
 
@@ -210,6 +203,15 @@ def register():
     return render_template('register.html')
 
 
+@app.route('/game/<slug>')
+def game_detail(slug):
+    game = next((g for g in GAMES if g['slug'] == slug), None)
+    if not game:
+        return render_template('404.html', active_nav=None, user=session.get('user')), 404
+    return render_template('game_detail.html', active_nav=game['category'] + '_games' if game['category'] == 'crash' else 'slots',
+                            game=game, user=session.get('user'))
+
+
 @app.route('/wallet/deposit', methods=['POST'])
 def wallet_deposit():
     # PLACEHOLDER ONLY — no payment gateway is wired up yet.
@@ -243,6 +245,70 @@ def not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return render_template('500.html', active_nav=None, user=session.get('user')), 500
+
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        # PLACEHOLDER ONLY — replace with a real check against an admin users table
+        # (hashed passwords, role column, ideally 2FA given this exposes financial data).
+        # This currently accepts ANY non-empty username/password. Do not deploy as-is.
+        if username and password:
+            session['admin_user'] = username
+            return redirect(url_for('admin_dashboard'))
+
+        return render_template('admin_login.html', error='Enter a username and password.')
+
+    return render_template('admin_login.html')
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_user', None)
+    return redirect(url_for('admin_login'))
+
+
+@app.route('/admin')
+def admin_dashboard():
+    if not session.get('admin_user'):
+        return redirect(url_for('admin_login'))
+
+    # TODO: replace all of the below with real aggregate queries against your
+    # users/transactions/bets tables (scoped to admin/staff roles only).
+    kpis = {
+        'active_users': '3,204',
+        'active_users_delta': 4.2,
+        'deposits_today': 482110,
+        'deposits_delta': 8.6,
+        'withdrawals_today': 310450,
+        'withdrawals_delta': 2.1,
+        'net_ggr': 171660,
+        'ggr_delta': 12.4,
+    }
+    deposits_chart = [
+        {'label': 'Mon', 'pct': 55}, {'label': 'Tue', 'pct': 68}, {'label': 'Wed', 'pct': 42},
+        {'label': 'Thu', 'pct': 74}, {'label': 'Fri', 'pct': 88}, {'label': 'Sat', 'pct': 95},
+        {'label': 'Sun', 'pct': 100},
+    ]
+    recent_transactions = [
+        {'user': '254***925', 'type': 'Deposit', 'method': 'M-Pesa', 'amount': 2000, 'status': 'complete', 'time': '09:14'},
+        {'user': '254***441', 'type': 'Withdrawal', 'method': 'USDT', 'amount': 5000, 'status': 'pending', 'time': '08:52'},
+        {'user': '254***769', 'type': 'Deposit', 'method': 'M-Pesa', 'amount': 500, 'status': 'complete', 'time': '08:40'},
+        {'user': '254***908', 'type': 'Withdrawal', 'method': 'M-Pesa', 'amount': 1200, 'status': 'failed', 'time': '08:15'},
+        {'user': '254***317', 'type': 'Deposit', 'method': 'Bank', 'amount': 10000, 'status': 'pending', 'time': '07:58'},
+    ]
+
+    return render_template(
+        'admin_dashboard.html',
+        active_nav='overview',
+        admin_user=session.get('admin_user'),
+        kpis=kpis,
+        deposits_chart=deposits_chart,
+        recent_transactions=recent_transactions,
+    )
 
 
 if __name__ == '__main__':
