@@ -20,6 +20,13 @@
 
     {% if game.category == 'crash' %}
     <div class="crash-stage">
+      <div class="stage-toolbar">
+        <div class="fairness-note"><span class="dot"></span>Provably fair (demo)</div>
+        <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">&#128266;</div>
+      </div>
+
+      <div class="round-history" id="roundHistory"></div>
+
       <div class="crash-top">
         <div class="gname">{{ game.name }}</div>
         <span class="crash-status live" id="crashStatus">Live round</span>
@@ -30,11 +37,38 @@
           <polyline id="crashLine" points="0,110 0,110" fill="none" stroke="#3FAE7A" stroke-width="2"/>
         </svg>
       </div>
-      <div class="crash-controls">
-        <input type="text" value="100" aria-label="Stake amount (KSH)">
-        <button class="btn-gold" id="crashBetBtn">Place bet</button>
-        <span style="font-size:12px; color:var(--text-faint);">Demo round &mdash; not a live bet</span>
+
+      <div class="bet-panels">
+        {% for i in [0, 1] %}
+        <div class="bet-panel" data-panel="{{ i }}">
+          <div class="bet-panel-tabs">
+            <div class="bet-panel-tab active" onclick="setPanelTab(this, {{ i }}, 'bet')">Bet</div>
+            <div class="bet-panel-tab" onclick="setPanelTab(this, {{ i }}, 'auto')">Auto</div>
+          </div>
+          <div class="stake-stepper">
+            <button onclick="adjustStake({{ i }}, -10)">&minus;</button>
+            <input type="text" id="stakeInput{{ i }}" value="{{ 100 if i == 0 else 50 }}" oninput="setStakeFromInput({{ i }}, this.value)">
+            <button onclick="adjustStake({{ i }}, 10)">+</button>
+          </div>
+          <div class="stake-quick">
+            <div onclick="setStake({{ i }}, 50)">50</div>
+            <div onclick="setStake({{ i }}, 100)">100</div>
+            <div onclick="setStake({{ i }}, 500)">500</div>
+            <div onclick="setStake({{ i }}, 1000)">1,000</div>
+          </div>
+          <div class="auto-row" id="autoRow{{ i }}" style="display:none;">
+            <span>Auto cash out</span>
+            <div class="switch" id="autoSwitch{{ i }}" onclick="toggleAuto({{ i }})"></div>
+          </div>
+          <div class="field auto-cashout-input" id="autoCashoutWrap{{ i }}" style="margin-bottom:12px;">
+            <label style="display:block; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-faint); margin-bottom:6px;">Cash out at (x)</label>
+            <input type="text" id="autoCashoutTarget{{ i }}" value="{{ '2.00' if i == 0 else '3.00' }}" oninput="setCashoutTarget({{ i }}, this.value)" style="width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:6px; padding:9px 11px; font-size:13px; color:var(--text); font-family:'JetBrains Mono';">
+          </div>
+          <button class="bet-action bet" id="actionBtn{{ i }}" onclick="handleAction({{ i }})">Bet KSH {{ 100 if i == 0 else 50 }}</button>
+        </div>
+        {% endfor %}
       </div>
+      <div style="font-size:11px; color:var(--text-faint); margin-top:12px; text-align:center;">Demo round &mdash; not a live bet, no wallet or RNG backend is connected</div>
     </div>
     {% else %}
     <div class="slot-stage">
@@ -43,9 +77,23 @@
         <div class="reel-cell" id="cell{{ i }}">🎰</div>
         {% endfor %}
       </div>
-      <div class="slot-controls">
-        <input type="text" value="50" aria-label="Stake amount (KSH)" style="width:110px; background:var(--panel-2); border:1px solid var(--line); border-radius:6px; padding:10px 12px; font-size:13px; color:var(--text); font-family:'JetBrains Mono';">
-        <button class="btn-gold" id="spinBtn" onclick="spinReels()">Spin</button>
+
+      <div class="slot-toolbar">
+        <div class="slot-readout">
+          <div><div class="label">Balance</div><div class="val">KSH 12,480.00</div></div>
+          <div><div class="label">Last spin</div><div class="val" id="lastSpin">&mdash;</div></div>
+        </div>
+        <div class="slot-toolbar-actions">
+          <div class="stake-stepper" style="width:150px;">
+            <button onclick="adjustSlotStake(-10)">&minus;</button>
+            <input type="text" id="slotStakeInput" value="50" oninput="setSlotStakeFromInput(this.value)">
+            <button onclick="adjustSlotStake(10)">+</button>
+          </div>
+          <div class="tool-btn" id="maxBetBtn" onclick="setMaxBet()">Max bet</div>
+          <div class="tool-btn" id="turboBtn" onclick="toggleTurbo()">Turbo: Off</div>
+          <div class="tool-btn" id="autoplayBtn" onclick="toggleAutoplay()">Autoplay: Off</div>
+          <div class="tool-btn spin" id="spinBtn" onclick="spinReels()">Spin</div>
+        </div>
       </div>
       <div style="text-align:center; margin-top:14px; font-size:12px; color:var(--text-faint);">Demo spin &mdash; for preview only, not connected to a real RNG or wallet</div>
     </div>
@@ -74,49 +122,260 @@
 {% block scripts %}
 <script>
 {% if game.category == 'crash' %}
-/* ---- decorative round animation only: NOT wired to real bets/RNG ---- */
+/* ---- decorative game only: NOT wired to real bets/RNG/wallet ---- */
 const multEl = document.getElementById('crashMult');
 const statusEl = document.getElementById('crashStatus');
 const lineEl = document.getElementById('crashLine');
-const betBtn = document.getElementById('crashBetBtn');
 
-function runRound(){
-  let t = 0;
-  const crashAt = 1.4 + Math.random() * 3.5;
+const panels = [
+  { staked: false, cashedOutAt: null, autoCashoutOn: false, stake: 100, cashoutTarget: 2.00, mode: 'bet' },
+  { staked: false, cashedOutAt: null, autoCashoutOn: false, stake: 50, cashoutTarget: 3.00, mode: 'bet' },
+];
+let phase = 'waiting';
+let currentMult = 1;
+let waitTimer = null;
+let soundOn = true;
+
+function $(id){ return document.getElementById(id); }
+
+function generateCrashPoint(){
+  const r = Math.min(Math.random(), 0.999999);
+  let point = 99 / (1 - r) / 100;
+  if (point > 1000000) point = 1000000;
+  if (point < 1.01) point = 1.01;
+  return point;
+}
+
+function formatMult(v){
+  if (v < 1000) return v.toFixed(2) + 'x';
+  return Math.round(v).toLocaleString() + 'x';
+}
+
+function setPanelTab(el, idx, mode){
+  const panel = el.closest('.bet-panel');
+  panel.querySelectorAll('.bet-panel-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  panels[idx].mode = mode;
+  panel.querySelector('.auto-row').style.display = mode === 'auto' ? 'flex' : 'none';
+  panel.querySelector('.auto-cashout-input').classList.toggle('visible', mode === 'auto' && panels[idx].autoCashoutOn);
+}
+
+function adjustStake(idx, delta){
+  panels[idx].stake = Math.max(10, panels[idx].stake + delta);
+  $('stakeInput' + idx).value = panels[idx].stake;
+  updateActionButton(idx);
+}
+function setStake(idx, val){
+  panels[idx].stake = val;
+  $('stakeInput' + idx).value = val;
+  updateActionButton(idx);
+}
+function setStakeFromInput(idx, val){
+  const v = parseInt(val) || 10;
+  panels[idx].stake = Math.max(10, v);
+  updateActionButton(idx);
+}
+function setCashoutTarget(idx, val){
+  const v = parseFloat(val);
+  if (!isNaN(v) && v > 1) panels[idx].cashoutTarget = v;
+}
+
+function toggleAuto(idx){
+  panels[idx].autoCashoutOn = !panels[idx].autoCashoutOn;
+  $('autoSwitch' + idx).classList.toggle('on', panels[idx].autoCashoutOn);
+  $('autoCashoutWrap' + idx).classList.toggle('visible', panels[idx].autoCashoutOn);
+}
+
+function updateActionButton(idx){
+  const p = panels[idx];
+  const btn = $('actionBtn' + idx);
+  if (phase === 'waiting') {
+    if (p.staked) {
+      btn.textContent = 'Cancel bet (KSH ' + p.stake + ')';
+      btn.className = 'bet-action cashout';
+    } else {
+      btn.textContent = 'Bet KSH ' + p.stake;
+      btn.className = 'bet-action bet';
+    }
+    btn.disabled = false;
+  } else if (phase === 'running') {
+    if (p.staked && !p.cashedOutAt) {
+      btn.textContent = 'Cash Out ' + formatMult(currentMult);
+      btn.className = 'bet-action cashout';
+      btn.disabled = false;
+    } else if (p.staked && p.cashedOutAt) {
+      btn.textContent = 'Cashed out @ ' + formatMult(p.cashedOutAt);
+      btn.className = 'bet-action cashout';
+      btn.disabled = true;
+    } else {
+      btn.textContent = 'Bet KSH ' + p.stake;
+      btn.className = 'bet-action bet';
+      btn.disabled = true;
+    }
+  } else {
+    if (p.staked && !p.cashedOutAt) {
+      btn.textContent = 'Busted';
+      btn.className = 'bet-action cashout';
+    } else if (p.staked && p.cashedOutAt) {
+      btn.textContent = 'Cashed out @ ' + formatMult(p.cashedOutAt);
+      btn.className = 'bet-action cashout';
+    } else {
+      btn.textContent = 'Bet KSH ' + p.stake;
+      btn.className = 'bet-action bet';
+    }
+    btn.disabled = true;
+  }
+}
+
+function handleAction(idx){
+  const p = panels[idx];
+  if (phase === 'waiting') {
+    p.staked = !p.staked;
+    updateActionButton(idx);
+  } else if (phase === 'running' && p.staked && !p.cashedOutAt) {
+    cashOutPanel(idx);
+  }
+}
+
+function cashOutPanel(idx){
+  panels[idx].cashedOutAt = currentMult;
+  updateActionButton(idx);
+}
+
+function addRoundHistory(mult){
+  const el = $('roundHistory');
+  const chip = document.createElement('div');
+  let cls = 'low';
+  if (mult >= 100) cls = 'huge'; else if (mult >= 10) cls = 'high'; else if (mult >= 2) cls = 'mid';
+  chip.className = 'round-chip ' + cls;
+  chip.textContent = formatMult(mult);
+  el.insertBefore(chip, el.firstChild);
+  while (el.children.length > 10) { el.removeChild(el.lastChild); }
+}
+
+function toggleSound(){
+  soundOn = !soundOn;
+  const el = $('soundToggle');
+  el.innerHTML = soundOn ? '&#128266;' : '&#128263;';
+  el.classList.toggle('muted', !soundOn);
+}
+
+function startWaitingPhase(){
+  phase = 'waiting';
+  currentMult = 1;
+  statusEl.className = 'crash-status live';
+  multEl.textContent = '1.00x';
+  multEl.className = 'crash-multiplier';
+  lineEl.setAttribute('points', '0,110');
+  panels.forEach((p, i) => { p.cashedOutAt = null; updateActionButton(i); });
+
+  let secondsLeft = 3;
+  statusEl.textContent = 'Next round in ' + secondsLeft + 's';
+  waitTimer = setInterval(() => {
+    secondsLeft--;
+    if (secondsLeft <= 0) {
+      clearInterval(waitTimer);
+      startLiveRound();
+    } else {
+      statusEl.textContent = 'Next round in ' + secondsLeft + 's';
+    }
+  }, 1000);
+}
+
+function startLiveRound(){
+  phase = 'running';
+  const crashAt = generateCrashPoint();
+  const duration = Math.min(14000, 2000 + Math.log10(crashAt) * 2000);
   statusEl.textContent = 'Live round';
   statusEl.className = 'crash-status live';
   multEl.className = 'crash-multiplier';
-  betBtn.disabled = false;
-  let points = '0,110';
+  panels.forEach((p, i) => updateActionButton(i));
 
-  const iv = setInterval(() => {
-    t += 0.08;
-    const mult = 1 + t * t * 0.18;
-    if (mult >= crashAt) {
-      multEl.textContent = crashAt.toFixed(2) + 'x';
+  let points = ['0,110'];
+  const start = performance.now();
+
+  function frame(now){
+    const elapsed = now - start;
+    const progress = Math.min(1, elapsed / duration);
+    currentMult = Math.pow(crashAt, progress);
+    multEl.textContent = formatMult(currentMult);
+
+    const x = progress * 400;
+    const y = Math.max(4, 110 - progress * 106);
+    points.push(`${x.toFixed(0)},${y.toFixed(0)}`);
+    lineEl.setAttribute('points', points.join(' '));
+
+    panels.forEach((p, i) => {
+      if (p.staked && !p.cashedOutAt && p.autoCashoutOn && currentMult >= p.cashoutTarget) {
+        cashOutPanel(i);
+      } else {
+        updateActionButton(i);
+      }
+    });
+
+    if (progress >= 1) {
+      phase = 'crashed';
       multEl.className = 'crash-multiplier crashed';
       statusEl.textContent = 'Crashed';
       statusEl.className = 'crash-status crashed';
-      betBtn.disabled = true;
-      clearInterval(iv);
-      setTimeout(runRound, 2200);
+      addRoundHistory(crashAt);
+      panels.forEach((p, i) => updateActionButton(i));
+      setTimeout(startWaitingPhase, 2200);
       return;
     }
-    multEl.textContent = mult.toFixed(2) + 'x';
-    const x = Math.min(400, t * 40);
-    const y = Math.max(4, 110 - (mult - 1) * 22);
-    points += ` ${x.toFixed(0)},${y.toFixed(0)}`;
-    lineEl.setAttribute('points', points);
-  }, 80);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
-runRound();
+
+startWaitingPhase();
 {% else %}
-/* ---- decorative reel spin only: NOT wired to real bets/RNG ---- */
+/* ---- decorative reel spin only: NOT wired to real bets/RNG/wallet ---- */
 const symbols = ['🍒','🔔','⭐','💎','🍋','7️⃣','🍇'];
 const spinBtn = document.getElementById('spinBtn');
+let isSpinning = false;
+let turbo = false;
+let autoplayOn = false;
+let autoplayInterval = null;
+let slotStake = 50;
+
+function adjustSlotStake(delta){
+  slotStake = Math.max(10, slotStake + delta);
+  document.getElementById('slotStakeInput').value = slotStake;
+}
+function setSlotStakeFromInput(val){
+  slotStake = Math.max(10, parseInt(val) || 10);
+}
+function setMaxBet(){
+  slotStake = 5000;
+  document.getElementById('slotStakeInput').value = slotStake;
+}
+function toggleTurbo(){
+  turbo = !turbo;
+  const btn = document.getElementById('turboBtn');
+  btn.textContent = 'Turbo: ' + (turbo ? 'On' : 'Off');
+  btn.classList.toggle('active', turbo);
+}
+function toggleAutoplay(){
+  autoplayOn = !autoplayOn;
+  const btn = document.getElementById('autoplayBtn');
+  btn.textContent = 'Autoplay: ' + (autoplayOn ? 'On' : 'Off');
+  btn.classList.toggle('active', autoplayOn);
+  if (autoplayOn) {
+    spinReels();
+    autoplayInterval = setInterval(spinReels, turbo ? 900 : 1600);
+  } else if (autoplayInterval) {
+    clearInterval(autoplayInterval);
+    autoplayInterval = null;
+  }
+}
 
 function spinReels(){
+  if (isSpinning) return;
+  isSpinning = true;
   spinBtn.disabled = true;
+  document.getElementById('lastSpin').textContent = 'KSH ' + slotStake + ' staked';
+
   const cells = [];
   for (let i = 0; i < 9; i++) {
     const cell = document.getElementById('cell' + i);
@@ -125,21 +384,23 @@ function spinReels(){
   }
 
   let ticks = 0;
+  const maxTicks = turbo ? 6 : 12;
   const iv = setInterval(() => {
     cells.forEach(c => { c.textContent = symbols[Math.floor(Math.random() * symbols.length)]; });
     ticks++;
-    if (ticks > 12) {
+    if (ticks > maxTicks) {
       clearInterval(iv);
       cells.forEach(c => c.classList.remove('spinning'));
       spinBtn.disabled = false;
+      isSpinning = false;
     }
-  }, 90);
+  }, turbo ? 60 : 90);
 }
 {% endif %}
 
 /* ---- winners ticker (shared across pages) ---- */
 const names = ['254***925','254***769','254***441','254***908','254***317','254***602','254***184'];
-const games = ['Avrika','Aviator','JetX','Spin Peak','Crash X','Base Camp'];
+const games = ['Aviator','JetX','Plinko','Mines','Chicken Road','Fortune Tiger'];
 const colors = [
   {bg:'rgba(217,164,65,0.18)', fg:'#D9A441'},
   {bg:'rgba(95,179,217,0.18)', fg:'#5FB3D9'},
