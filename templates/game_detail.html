@@ -34,7 +34,20 @@
       <div class="crash-multiplier" id="crashMult">1.00x</div>
       <div class="crash-track">
         <svg viewBox="0 0 400 110" preserveAspectRatio="none">
-          <polyline id="crashLine" points="0,110 0,110" fill="none" stroke="#3FAE7A" stroke-width="2"/>
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#D9A441" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#D9A441" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path id="crashArea" fill="url(#areaGrad)" stroke="none"/>
+          <polyline id="crashLine" points="0,110" fill="none" stroke="#D9A441" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <g id="planeIcon" transform="translate(0,110) rotate(0)">
+            <path d="M0,-6 L16,0 L0,6 L5,0 Z" fill="#D9A441"/>
+            <path d="M5,-1 L-5,-7 L-2,-1 Z" fill="#D9A441"/>
+            <path d="M5,1 L-5,7 L-2,1 Z" fill="#D9A441"/>
+          </g>
+          <text id="crashExplosion" class="crash-explosion" x="0" y="110">&#128165;</text>
         </svg>
       </div>
 
@@ -126,6 +139,9 @@
 const multEl = document.getElementById('crashMult');
 const statusEl = document.getElementById('crashStatus');
 const lineEl = document.getElementById('crashLine');
+const areaEl = document.getElementById('crashArea');
+const planeEl = document.getElementById('planeIcon');
+const explosionEl = document.getElementById('crashExplosion');
 
 const panels = [
   { staked: false, cashedOutAt: null, autoCashoutOn: false, stake: 100, cashoutTarget: 2.00, mode: 'bet' },
@@ -267,6 +283,10 @@ function startWaitingPhase(){
   multEl.textContent = '1.00x';
   multEl.className = 'crash-multiplier';
   lineEl.setAttribute('points', '0,110');
+  areaEl.setAttribute('d', '');
+  planeEl.classList.remove('hidden');
+  planeEl.setAttribute('transform', 'translate(0,110) rotate(0)');
+  explosionEl.classList.remove('show');
   panels.forEach((p, i) => { p.cashedOutAt = null; updateActionButton(i); });
 
   let secondsLeft = 3;
@@ -291,19 +311,48 @@ function startLiveRound(){
   multEl.className = 'crash-multiplier';
   panels.forEach((p, i) => updateActionButton(i));
 
-  let points = ['0,110'];
+  const pxPerSecond = 55;
+  let history = [{ t: 0, mult: 1 }];
+  let lastRecord = 0;
   const start = performance.now();
+
+  function toXY(t, mult, yScaleRef, offset){
+    const wx = t * pxPerSecond;
+    const x = wx - offset;
+    const logRef = Math.log(Math.max(yScaleRef, 1.01));
+    let y = 110 - (Math.log(Math.max(mult, 1)) / logRef) * 106;
+    if (y < 4) y = 4;
+    if (y > 110) y = 110;
+    return [x, y];
+  }
 
   function frame(now){
     const elapsed = now - start;
+    const elapsedSec = elapsed / 1000;
     const progress = Math.min(1, elapsed / duration);
     currentMult = Math.pow(crashAt, progress);
     multEl.textContent = formatMult(currentMult);
 
-    const x = progress * 400;
-    const y = Math.max(4, 110 - progress * 106);
-    points.push(`${x.toFixed(0)},${y.toFixed(0)}`);
-    lineEl.setAttribute('points', points.join(' '));
+    if (elapsed - lastRecord >= 60 || progress >= 1) {
+      history.push({ t: elapsedSec, mult: currentMult });
+      lastRecord = elapsed;
+    }
+
+    const yScaleRef = Math.max(currentMult * 1.25, 2);
+    const latestWorldX = elapsedSec * pxPerSecond;
+    const offset = Math.max(0, latestWorldX - 400);
+
+    const displayPts = history.map(p => toXY(p.t, p.mult, yScaleRef, offset));
+    const [tipX, tipY] = toXY(elapsedSec, currentMult, yScaleRef, offset);
+    displayPts.push([tipX, tipY]);
+
+    lineEl.setAttribute('points', displayPts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' '));
+    const firstX = displayPts[0][0];
+    areaEl.setAttribute('d', `M ${firstX.toFixed(1)},110 L ` + displayPts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' L ') + ` L ${tipX.toFixed(1)},110 Z`);
+
+    const prev = displayPts.length > 1 ? displayPts[displayPts.length - 2] : [0, 110];
+    const angle = Math.atan2(tipY - prev[1], tipX - prev[0]) * (180 / Math.PI);
+    planeEl.setAttribute('transform', `translate(${tipX.toFixed(1)},${tipY.toFixed(1)}) rotate(${angle.toFixed(1)})`);
 
     panels.forEach((p, i) => {
       if (p.staked && !p.cashedOutAt && p.autoCashoutOn && currentMult >= p.cashoutTarget) {
@@ -318,9 +367,14 @@ function startLiveRound(){
       multEl.className = 'crash-multiplier crashed';
       statusEl.textContent = 'Crashed';
       statusEl.className = 'crash-status crashed';
+      lineEl.setAttribute('stroke', 'var(--fall)');
+      planeEl.classList.add('hidden');
+      explosionEl.setAttribute('x', tipX.toFixed(1));
+      explosionEl.setAttribute('y', tipY.toFixed(1));
+      explosionEl.classList.add('show');
       addRoundHistory(crashAt);
       panels.forEach((p, i) => updateActionButton(i));
-      setTimeout(startWaitingPhase, 2200);
+      setTimeout(() => { lineEl.setAttribute('stroke', '#D9A441'); startWaitingPhase(); }, 2200);
       return;
     }
     requestAnimationFrame(frame);
