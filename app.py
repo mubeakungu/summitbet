@@ -8,21 +8,23 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-only-change-me')
 # ---------- Master games catalog ----------
 # TODO: replace with a real query against your games table. This is the single
 # source of truth for every game card across Top games / Slots / Crash games.
+# NOTE: these are real industry game titles used here purely as display names for
+# our own decorative demo pages — no actual provider integration is wired up.
 GAMES = [
     {'slug': 'aviator', 'name': 'Aviator', 'provider': 'Spribe', 'initials': 'AV', 'color': '#1F3D2E', 'category': 'crash', 'hot': True},
-    {'slug': 'jetx', 'name': 'JetX', 'provider': 'SmartSoft', 'initials': 'JX', 'color': '#14211B', 'category': 'crash', 'hot': True},
-    {'slug': 'spin-peak', 'name': 'Spin Peak', 'provider': 'Summit Originals', 'initials': 'SP', 'color': '#1B1306', 'category': 'crash', 'hot': False},
-    {'slug': 'crash-x', 'name': 'Crash X', 'provider': 'BGaming', 'initials': 'CX', 'color': '#0F2A28', 'category': 'crash', 'hot': False},
-    {'slug': 'base-camp', 'name': 'Base Camp', 'provider': 'Summit Originals', 'initials': 'BC', 'color': '#1F3D2E', 'category': 'crash', 'hot': False},
-    {'slug': 'ice-peak', 'name': 'Ice Peak', 'provider': 'Spribe', 'initials': 'IP', 'color': '#1B1306', 'category': 'crash', 'hot': True},
-    {'slug': 'gold-rush', 'name': 'Gold Rush', 'provider': 'Pragmatic Play', 'initials': 'GR', 'color': '#14211B', 'category': 'slot', 'hot': True},
-    {'slug': 'wolf-gold', 'name': 'Wolf Gold', 'provider': 'Pragmatic Play', 'initials': 'WG', 'color': '#0F2A28', 'category': 'slot', 'hot': False},
+    {'slug': 'jetx', 'name': 'JetX', 'provider': 'SmartSoft Gaming', 'initials': 'JX', 'color': '#14211B', 'category': 'crash', 'hot': True},
+    {'slug': 'plinko', 'name': 'Plinko', 'provider': 'Spribe', 'initials': 'PL', 'color': '#1B1306', 'category': 'crash', 'hot': False},
+    {'slug': 'mines', 'name': 'Mines', 'provider': 'Spribe', 'initials': 'MN', 'color': '#0F2A28', 'category': 'crash', 'hot': False},
+    {'slug': 'chicken-road', 'name': 'Chicken Road', 'provider': 'InOut Games', 'initials': 'CR', 'color': '#1F3D2E', 'category': 'crash', 'hot': False},
+    {'slug': 'dragon-tower', 'name': 'Dragon Tower', 'provider': 'Gamzix', 'initials': 'DT', 'color': '#1B1306', 'category': 'crash', 'hot': True},
     {'slug': 'sweet-bonanza', 'name': 'Sweet Bonanza', 'provider': 'Pragmatic Play', 'initials': 'SB', 'color': '#1B1306', 'category': 'slot', 'hot': True},
-    {'slug': 'fire-peak', 'name': 'Fire Peak', 'provider': 'Summit Originals', 'initials': 'FP', 'color': '#1F3D2E', 'category': 'slot', 'hot': False},
-    {'slug': 'diamond-rift', 'name': 'Diamond Rift', 'provider': 'BGaming', 'initials': 'DR', 'color': '#14211B', 'category': 'slot', 'hot': False},
-    {'slug': 'book-of-ridge', 'name': 'Book of Ridge', 'provider': 'BGaming', 'initials': 'BR', 'color': '#0F2A28', 'category': 'slot', 'hot': False},
-    {'slug': 'lucky-slopes', 'name': 'Lucky Slopes', 'provider': 'Summit Originals', 'initials': 'LS', 'color': '#1B1306', 'category': 'slot', 'hot': False},
+    {'slug': 'wolf-gold', 'name': 'Wolf Gold', 'provider': 'Pragmatic Play', 'initials': 'WG', 'color': '#0F2A28', 'category': 'slot', 'hot': False},
     {'slug': 'sugar-rush', 'name': 'Sugar Rush', 'provider': 'Pragmatic Play', 'initials': 'SR', 'color': '#1F3D2E', 'category': 'slot', 'hot': False},
+    {'slug': 'big-bass-bonanza', 'name': 'Big Bass Bonanza', 'provider': 'Pragmatic Play', 'initials': 'BB', 'color': '#14211B', 'category': 'slot', 'hot': True},
+    {'slug': 'gates-of-olympus', 'name': 'Gates of Olympus', 'provider': 'Pragmatic Play', 'initials': 'GO', 'color': '#1B1306', 'category': 'slot', 'hot': True},
+    {'slug': 'fortune-tiger', 'name': 'Fortune Tiger', 'provider': 'PG Soft', 'initials': 'FT', 'color': '#0F2A28', 'category': 'slot', 'hot': False},
+    {'slug': 'book-of-dead', 'name': 'Book of Dead', 'provider': "Play'n GO", 'initials': 'BD', 'color': '#1F3D2E', 'category': 'slot', 'hot': False},
+    {'slug': 'money-train-3', 'name': 'Money Train 3', 'provider': 'Relax Gaming', 'initials': 'MT', 'color': '#14211B', 'category': 'slot', 'hot': False},
 ]
 
 
