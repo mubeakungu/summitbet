@@ -1,0 +1,75 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Admin dashboard — Summit Stakes{% endblock %}
+
+{% block content %}
+<div class="content" style="display:block;">
+  <div class="crumb">Overview</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="label">Active users</div>
+      <div class="value">{{ kpis.active_users }}</div>
+      <div class="delta up">&uarr; {{ kpis.active_users_delta }}% vs yesterday</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Deposits today</div>
+      <div class="value">KSH {{ '{:,}'.format(kpis.deposits_today) }}</div>
+      <div class="delta up">&uarr; {{ kpis.deposits_delta }}% vs yesterday</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Withdrawals today</div>
+      <div class="value">KSH {{ '{:,}'.format(kpis.withdrawals_today) }}</div>
+      <div class="delta down">&darr; {{ kpis.withdrawals_delta }}% vs yesterday</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Net GGR today</div>
+      <div class="value">KSH {{ '{:,}'.format(kpis.net_ggr) }}</div>
+      <div class="delta up">&uarr; {{ kpis.ggr_delta }}% vs yesterday</div>
+    </div>
+  </div>
+
+  <div class="panel chart-panel">
+    <h3>Deposits &mdash; last 7 days</h3>
+    <div class="bar-chart">
+      {% for day in deposits_chart %}
+      <div class="bar-col">
+        <div class="bar" style="height:{{ day.pct }}%;"></div>
+        <div class="bar-label">{{ day.label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2>Recent transactions</h2>
+    <div class="more">View all</div>
+  </div>
+  <div class="panel">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Type</th>
+          <th>Method</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tx in recent_transactions %}
+        <tr>
+          <td>{{ tx.user }}</td>
+          <td>{{ tx.type }}</td>
+          <td>{{ tx.method }}</td>
+          <td>KSH {{ '{:,}'.format(tx.amount) }}</td>
+          <td><span class="status-pill {{ tx.status }}">{{ tx.status }}</span></td>
+          <td style="color:var(--text-faint);">{{ tx.time }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
