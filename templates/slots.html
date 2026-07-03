@@ -16,7 +16,7 @@
 
     <div class="games-grid">
       {% for game in games %}
-      <div class="game-card">
+      <a href="{{ url_for('game_detail', slug=game.slug) }}" class="game-card" style="text-decoration:none; color:inherit; display:block;">
         <div class="game-thumb" style="background:{{ game.color }};">
           {{ game.initials }}
           {% if game.hot %}<span class="hot">Hot</span>{% endif %}
@@ -25,7 +25,7 @@
           <div class="gname">{{ game.name }}</div>
           <div class="gprovider">{{ game.provider }}</div>
         </div>
-      </div>
+      </a>
       {% endfor %}
     </div>
   </div>
