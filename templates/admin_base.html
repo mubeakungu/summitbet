@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Admin — Summit Stakes{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/summit.css') }}">
+</head>
+<body>
+<div class="frame">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark"></div>
+      <div>
+        <div class="name">SUMMIT<span>STAKES</span></div>
+        <div class="tag">Admin panel</div>
+      </div>
+    </div>
+
+    <div class="navlabel">Overview</div>
+    <a href="{{ url_for('admin_dashboard') }}" class="navitem {% if active_nav == 'overview' %}active{% endif %}"><span class="dot"></span>Dashboard</a>
+
+    <div class="navlabel">Manage</div>
+    <a href="#" class="navitem"><span class="dot"></span>Users</a>
+    <a href="#" class="navitem"><span class="dot"></span>Transactions</a>
+    <a href="#" class="navitem"><span class="dot"></span>Games</a>
+    <a href="#" class="navitem"><span class="dot"></span>Payouts</a>
+
+    <div class="navlabel">System</div>
+    <a href="#" class="navitem"><span class="dot"></span>Settings</a>
+    <a href="{{ url_for('dashboard') }}" class="navitem"><span class="dot"></span>Back to site</a>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="font-family:'Barlow Condensed'; font-weight:600; font-size:16px;">
+        Admin<span class="admin-badge">Staff only</span>
+      </div>
+      <div class="topactions">
+        <span style="font-size:12.5px; color:var(--text-dim);">{{ admin_user }}</span>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-ghost">Log out</a>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div style="padding:16px 26px 0;">
+        {% for category, message in messages %}
+        <div class="error-banner" style="{% if category == 'success' %}background:rgba(63,174,122,0.12); border-color:var(--rise); color:var(--rise);{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>
