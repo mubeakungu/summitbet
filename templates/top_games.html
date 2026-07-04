@@ -1,12 +1,9 @@
 {% extends "base.html" %}
-
 {% block title %}Top games — Summit Stakes{% endblock %}
-
 {% block content %}
 <div class="content">
   <div class="colmain">
     <div class="crumb"><span class="back">&larr;</span> Top games</div>
-
     <div class="filter-row">
       <span class="filter-chip active">All</span>
       <span class="filter-chip">Crash</span>
@@ -14,12 +11,22 @@
       <span class="filter-chip">Live tables</span>
       <span class="filter-chip">Instant win</span>
     </div>
-
     <div class="games-grid">
       {% for game in games %}
       <a href="{{ url_for('game_detail', slug=game.slug) }}" class="game-card" style="text-decoration:none; color:inherit; display:block;">
-        <div class="game-thumb" style="background:{{ game.color }};">
-          {{ game.initials }}
+        <div class="game-thumb" style="background:{{ game.color }}; position:relative; overflow:hidden;">
+          {% if game.image %}
+            <img src="{{ url_for('static', filename='img/games/' ~ game.image) }}"
+                 alt="{{ game.name }}"
+                 loading="lazy"
+                 style="width:100%; height:100%; object-fit:cover; display:block;"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; position:absolute; top:0; left:0;">
+              {{ game.initials }}
+            </div>
+          {% else %}
+            {{ game.initials }}
+          {% endif %}
           {% if game.hot %}<span class="hot">Hot</span>{% endif %}
         </div>
         <div class="game-meta">
@@ -30,7 +37,6 @@
       {% endfor %}
     </div>
   </div>
-
   <div class="colside">
     <div class="panel">
       <h3>Payment methods</h3>
@@ -38,7 +44,6 @@
       <div class="pay-row"><span class="name">USDT (TRC20)</span><span class="pay-tag">Instant</span></div>
       <div class="pay-row"><span class="name">Bank transfer</span><span class="pay-tag">~10 min</span></div>
     </div>
-
     <div class="panel">
       <div style="display:flex; align-items:center; margin-bottom:14px;">
         <h3 style="margin:0;">Winners</h3>
@@ -49,7 +54,6 @@
   </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script>
 const names = ['254***925','254***769','254***441','254***908','254***317','254***602','254***184'];
@@ -59,10 +63,8 @@ const colors = [
   {bg:'rgba(95,179,217,0.18)', fg:'#5FB3D9'},
   {bg:'rgba(63,174,122,0.18)', fg:'#3FAE7A'}
 ];
-
 function randAmt(){ return (Math.random()*4000+200).toFixed(0); }
 function initials(g){ return g.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
-
 function makeRow(){
   const c = colors[Math.floor(Math.random()*colors.length)];
   const g = games[Math.floor(Math.random()*games.length)];
@@ -78,10 +80,8 @@ function makeRow(){
   `;
   return row;
 }
-
 const list = document.getElementById('winnerList');
 for(let i=0;i<5;i++){ list.appendChild(makeRow()); }
-
 setInterval(()=>{
   list.insertBefore(makeRow(), list.firstChild);
   if(list.children.length > 6){ list.removeChild(list.lastChild); }
