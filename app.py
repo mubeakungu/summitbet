@@ -10,21 +10,24 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-only-change-me')
 # source of truth for every game card across Top games / Slots / Crash games.
 # NOTE: these are real industry game titles used here purely as display names for
 # our own decorative demo pages — no actual provider integration is wired up.
+# 'image' points to static/img/games/<file> — original illustrated placeholder art
+# (not real provider assets). Templates fall back to the colored 'initials' box
+# via onerror if the file is missing.
 GAMES = [
-    {'slug': 'aviator', 'name': 'Aviator', 'provider': 'Spribe', 'initials': 'AV', 'color': '#1F3D2E', 'category': 'crash', 'hot': True},
-    {'slug': 'jetx', 'name': 'JetX', 'provider': 'SmartSoft Gaming', 'initials': 'JX', 'color': '#14211B', 'category': 'crash', 'hot': True},
-    {'slug': 'plinko', 'name': 'Plinko', 'provider': 'Spribe', 'initials': 'PL', 'color': '#1B1306', 'category': 'crash', 'hot': False},
-    {'slug': 'mines', 'name': 'Mines', 'provider': 'Spribe', 'initials': 'MN', 'color': '#0F2A28', 'category': 'crash', 'hot': False},
-    {'slug': 'chicken-road', 'name': 'Chicken Road', 'provider': 'InOut Games', 'initials': 'CR', 'color': '#1F3D2E', 'category': 'crash', 'hot': False},
-    {'slug': 'dragon-tower', 'name': 'Dragon Tower', 'provider': 'Gamzix', 'initials': 'DT', 'color': '#1B1306', 'category': 'crash', 'hot': True},
-    {'slug': 'sweet-bonanza', 'name': 'Sweet Bonanza', 'provider': 'Pragmatic Play', 'initials': 'SB', 'color': '#1B1306', 'category': 'slot', 'hot': True},
-    {'slug': 'wolf-gold', 'name': 'Wolf Gold', 'provider': 'Pragmatic Play', 'initials': 'WG', 'color': '#0F2A28', 'category': 'slot', 'hot': False},
-    {'slug': 'sugar-rush', 'name': 'Sugar Rush', 'provider': 'Pragmatic Play', 'initials': 'SR', 'color': '#1F3D2E', 'category': 'slot', 'hot': False},
-    {'slug': 'big-bass-bonanza', 'name': 'Big Bass Bonanza', 'provider': 'Pragmatic Play', 'initials': 'BB', 'color': '#14211B', 'category': 'slot', 'hot': True},
-    {'slug': 'gates-of-olympus', 'name': 'Gates of Olympus', 'provider': 'Pragmatic Play', 'initials': 'GO', 'color': '#1B1306', 'category': 'slot', 'hot': True},
-    {'slug': 'fortune-tiger', 'name': 'Fortune Tiger', 'provider': 'PG Soft', 'initials': 'FT', 'color': '#0F2A28', 'category': 'slot', 'hot': False},
-    {'slug': 'book-of-dead', 'name': 'Book of Dead', 'provider': "Play'n GO", 'initials': 'BD', 'color': '#1F3D2E', 'category': 'slot', 'hot': False},
-    {'slug': 'money-train-3', 'name': 'Money Train 3', 'provider': 'Relax Gaming', 'initials': 'MT', 'color': '#14211B', 'category': 'slot', 'hot': False},
+    {'slug': 'aviator', 'name': 'Aviator', 'provider': 'Spribe', 'initials': 'AV', 'color': '#1F3D2E', 'category': 'crash', 'hot': True, 'image': 'aviator.png'},
+    {'slug': 'jetx', 'name': 'JetX', 'provider': 'SmartSoft Gaming', 'initials': 'JX', 'color': '#14211B', 'category': 'crash', 'hot': True, 'image': 'jetx.png'},
+    {'slug': 'plinko', 'name': 'Plinko', 'provider': 'Spribe', 'initials': 'PL', 'color': '#1B1306', 'category': 'crash', 'hot': False, 'image': 'plinko.png'},
+    {'slug': 'mines', 'name': 'Mines', 'provider': 'Spribe', 'initials': 'MN', 'color': '#0F2A28', 'category': 'crash', 'hot': False, 'image': 'mines.png'},
+    {'slug': 'chicken-road', 'name': 'Chicken Road', 'provider': 'InOut Games', 'initials': 'CR', 'color': '#1F3D2E', 'category': 'crash', 'hot': False, 'image': 'chicken-road.png'},
+    {'slug': 'dragon-tower', 'name': 'Dragon Tower', 'provider': 'Gamzix', 'initials': 'DT', 'color': '#1B1306', 'category': 'crash', 'hot': True, 'image': 'dragon-tower.png'},
+    {'slug': 'sweet-bonanza', 'name': 'Sweet Bonanza', 'provider': 'Pragmatic Play', 'initials': 'SB', 'color': '#1B1306', 'category': 'slot', 'hot': True, 'image': 'sweet-bonanza.png'},
+    {'slug': 'wolf-gold', 'name': 'Wolf Gold', 'provider': 'Pragmatic Play', 'initials': 'WG', 'color': '#0F2A28', 'category': 'slot', 'hot': False, 'image': 'wolf-gold.png'},
+    {'slug': 'sugar-rush', 'name': 'Sugar Rush', 'provider': 'Pragmatic Play', 'initials': 'SR', 'color': '#1F3D2E', 'category': 'slot', 'hot': False, 'image': 'sugar-rush.png'},
+    {'slug': 'big-bass-bonanza', 'name': 'Big Bass Bonanza', 'provider': 'Pragmatic Play', 'initials': 'BB', 'color': '#14211B', 'category': 'slot', 'hot': True, 'image': 'big-bass-bonanza.png'},
+    {'slug': 'gates-of-olympus', 'name': 'Gates of Olympus', 'provider': 'Pragmatic Play', 'initials': 'GO', 'color': '#1B1306', 'category': 'slot', 'hot': True, 'image': 'gates-of-olympus.png'},
+    {'slug': 'fortune-tiger', 'name': 'Fortune Tiger', 'provider': 'PG Soft', 'initials': 'FT', 'color': '#0F2A28', 'category': 'slot', 'hot': False, 'image': 'fortune-tiger.png'},
+    {'slug': 'book-of-dead', 'name': 'Book of Dead', 'provider': "Play'n GO", 'initials': 'BD', 'color': '#1F3D2E', 'category': 'slot', 'hot': False, 'image': 'book-of-dead.png'},
+    {'slug': 'money-train-3', 'name': 'Money Train 3', 'provider': 'Relax Gaming', 'initials': 'MT', 'color': '#14211B', 'category': 'slot', 'hot': False, 'image': 'money-train-3.png'},
 ]
 
 
