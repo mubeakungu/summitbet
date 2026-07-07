@@ -343,4 +343,232 @@ for fn in [aviator, jetx, plinko, mines, chicken_road, dragon_tower,
            gates_of_olympus, fortune_tiger, book_of_dead, money_train_3]:
     fn()
 
+# ---------- NEW CRASH GAMES ----------
+
+def crash_curve_card(top_hex, bottom_hex, glow, line_color, mult_text, title, icon_fn):
+    img = base_card(top_hex, bottom_hex)
+    radial_glow(img, (480, 110), 160, glow)
+    d = ImageDraw.Draw(img)
+    pts = [(50, 350), (170, 300), (290, 225), (410, 155), (500, 100)]
+    dashed_curve(d, pts, line_color, width=5)
+    icon_fn(d, 500, 100)
+    f = font(40)
+    d.text((60, 40), mult_text, font=f, fill=line_color)
+    f2 = font(22)
+    d.text((30, H-46), title, font=f2, fill=(230, 230, 230))
+    return img, d
+
+def aero():
+    def icon(d, px, py):
+        d.polygon([(px-50, py+14), (px+36, py-4), (px+50, py+2), (px+36, py+8), (px-50, py+26)], fill=(235, 230, 225))
+        d.polygon([(px-4, py-30), (px+6, py-2), (px-14, py-2)], fill=(200, 40, 40))
+        d.polygon([(px-30, py+16), (px-40, py+34), (px-14, py+18)], fill=(200, 40, 40))
+    img, d = crash_curve_card("#3a1414", "#160505", (210, 80, 60), (235, 150, 130), "1.92x", "AERO", icon)
+    save(img, "aero")
+
+def avrika():
+    def icon(d, px, py):
+        d.polygon([(px-52, py+10), (px+38, py-8), (px+52, py-2), (px+38, py+4), (px-52, py+22)], fill=(225, 40, 40))
+        d.polygon([(px-2, py-36), (px+8, py-6), (px-12, py-6)], fill=(225, 40, 40))
+    img, d = crash_curve_card("#160505", "#050101", (200, 40, 40), (230, 60, 60), "1.47x", "AVRIKA", icon)
+    save(img, "avrika")
+
+def chicken_panic():
+    img = base_card("#2a1c0a", "#0f0a03")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 150, (255, 150, 60))
+    d = ImageDraw.Draw(img)
+    cx, cy = 300, 230
+    d.ellipse([cx-40, cy-40, cx+40, cy+40], fill=(240, 100, 70))
+    d.polygon([(cx+30, cy-8), (cx+56, cy), (cx+30, cy+8)], fill=(255, 210, 60))
+    d.ellipse([cx-20, cy-52, cx, cy-32], fill=(240, 100, 70))
+    d.polygon([(cx-34, cy+34), (cx-20, cy+66), (cx-6, cy+34)], fill=(255, 190, 40))
+    for i, (dx, dy) in enumerate([(-70,-20),(-80,10),(-70,40)]):
+        d.line([(cx+dx, cy+dy), (cx+dx-30, cy+dy)], fill=(255, 150, 60), width=4)
+    f = font(24)
+    d.text((30, 30), "CHICKEN PANIC", font=f, fill=(255, 190, 110))
+    save(img, "chicken-panic")
+
+def aviabet():
+    def icon(d, px, py):
+        d.polygon([(px-50, py+16), (px+36, py-6), (px+50, py), (px+36, py+10), (px-50, py+28)], fill=(255, 240, 245))
+        d.polygon([(px-2, py-32), (px+8, py-4), (px-12, py-4)], fill=(230, 40, 110))
+    img, d = crash_curve_card("#3a0d24", "#140310", (230, 40, 130), (245, 130, 190), "2.71x", "AVIABET", icon)
+    save(img, "aviabet")
+
+def crossfire_chicken():
+    img = base_card("#2a0a0a", "#0e0303")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 140, (230, 60, 40))
+    d = ImageDraw.Draw(img)
+    cx, cy = 300, 230
+    d.ellipse([cx-70, cy-70, cx+70, cy+70], outline=(230, 60, 40), width=4)
+    d.line([(cx-90, cy), (cx+90, cy)], fill=(230, 60, 40), width=3)
+    d.line([(cx, cy-90), (cx, cy+90)], fill=(230, 60, 40), width=3)
+    d.ellipse([cx-36, cy-36, cx+36, cy+36], fill=(235, 110, 60))
+    d.polygon([(cx+24, cy-4), (cx+46, cy), (cx+24, cy+4)], fill=(255, 210, 60))
+    f = font(22)
+    d.text((30, 30), "CROSSFIRE CHICKEN", font=f, fill=(255, 160, 120))
+    save(img, "crossfire-chicken")
+
+def aviatrix():
+    def icon(d, px, py):
+        d.polygon([(px-54, py+8), (px+40, py-12), (px+54, py-4), (px+40, py+2), (px-54, py+20)], fill=(200, 220, 240))
+        d.polygon([(px-10, py-40), (px+2, py-8), (px-20, py-8)], fill=(70, 130, 210))
+        d.polygon([(px-40, py+10), (px-52, py+30), (px-22, py+12)], fill=(70, 130, 210))
+    img, d = crash_curve_card("#0a1830", "#030812", (60, 120, 210), (140, 190, 240), "4.18x", "AVIATRIX", icon)
+    save(img, "aviatrix")
+
+def crashx():
+    img = base_card("#1c0505", "#080202")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (460, 100), 150, (230, 40, 40))
+    d = ImageDraw.Draw(img)
+    pts = [(50, 350), (180, 290), (300, 210), (420, 140), (500, 90)]
+    dashed_curve(d, pts, (240, 70, 70), width=6)
+    f = font(56)
+    d.text((380, 250), "X", font=font(80), fill=(230, 40, 40))
+    f2 = font(22)
+    d.text((30, 30), "CRASH X", font=f2, fill=(240, 120, 120))
+    save(img, "crashx")
+
+def goalx():
+    img = base_card("#0a2a12", "#031006")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 140, (100, 220, 130))
+    d = ImageDraw.Draw(img)
+    pts = [(50, 340), (170, 290), (290, 220), (410, 150), (500, 100)]
+    dashed_curve(d, pts, (150, 230, 170), width=5)
+    cx, cy = 500, 100
+    d.ellipse([cx-20, cy-20, cx+20, cy+20], fill=(255, 255, 255))
+    d.polygon([(cx-6, cy-10), (cx+8, cy-4), (cx+2, cy+10), (cx-10, cy+6)], fill=(30, 30, 30))
+    f = font(30)
+    d.text((30, 30), "GOALX", font=f, fill=(150, 230, 170))
+    save(img, "goalx")
+
+for fn in [aero, avrika, chicken_panic, aviabet, crossfire_chicken, aviatrix, crashx, goalx]:
+    fn()
+
+# ---------- NEW SLOT GAMES ----------
+
+def tajiri_fruits():
+    img = base_card("#3a1a06", "#160902")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 150, (255, 190, 60))
+    d = ImageDraw.Draw(img)
+    random.seed(9)
+    fruitcolors = [(230,50,50),(255,170,40),(255,230,60),(90,190,90)]
+    for i in range(8):
+        x = 80 + (i % 4) * 130
+        y = 180 + (i // 4) * 130
+        c = random.choice(fruitcolors)
+        d.ellipse([x-34, y-34, x+34, y+34], fill=c)
+        d.ellipse([x-10, y-40, x+6, y-26], fill=(90, 160, 70))
+    f = font(26)
+    d.text((30, 30), "TAJIRI FRUITS", font=f, fill=(255, 210, 120))
+    save(img, "tajiri-fruits")
+
+def fruit_mania():
+    img = base_card("#141033", "#050316")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 150, (150, 200, 255))
+    d = ImageDraw.Draw(img)
+    random.seed(11)
+    fruitcolors = [(230,60,90),(255,180,60),(120,220,255),(150,230,120),(255,255,255)]
+    for _ in range(16):
+        x = random.randint(40, W-40)
+        y = random.randint(60, H-40)
+        c = random.choice(fruitcolors)
+        r = random.randint(16, 28)
+        d.ellipse([x-r, y-r, x+r, y+r], fill=c)
+    f = font(30)
+    d.text((30, 30), "FRUIT MANIA", font=f, fill=(230, 230, 255))
+    save(img, "fruit-mania")
+
+def regal_fruits():
+    img = base_card("#2a1040", "#0d0420")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 90), 160, (255, 210, 90))
+    d = ImageDraw.Draw(img)
+    cx, cy = 320, 190
+    d.polygon([(cx-70, cy+20), (cx-50, cy-30), (cx-20, cy), (cx, cy-50), (cx+20, cy), (cx+50, cy-30), (cx+70, cy+20)], fill=(240, 200, 90))
+    d.rectangle([cx-70, cy+20, cx+70, cy+40], fill=(240, 200, 90))
+    random.seed(4)
+    fruitcolors = [(230,60,60),(255,170,40),(150,230,120)]
+    for i in range(3):
+        x = 200 + i*120
+        y = 300
+        c = fruitcolors[i]
+        d.ellipse([x-30, y-30, x+30, y+30], fill=c)
+    f = font(24)
+    d.text((30, 30), "REGAL FRUITS 1000", font=f, fill=(255, 220, 140))
+    save(img, "regal-fruits")
+
+def hot_hot_fruit():
+    img = base_card("#3a0a0a", "#150303")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 160, (255, 120, 40), alpha=140)
+    d = ImageDraw.Draw(img)
+    for i in range(3):
+        x = 220 + i*110
+        d.polygon([(x, 340), (x-30, 240), (x, 180), (x+30, 240)], fill=(255, 130, 40))
+        d.polygon([(x, 320), (x-16, 250), (x, 210), (x+16, 250)], fill=(255, 220, 90))
+    f = font(24)
+    d.text((30, 30), "HOT HOT FRUIT", font=f, fill=(255, 190, 120))
+    save(img, "hot-hot-fruit")
+
+def aztec_gems():
+    img = base_card("#062a2a", "#021010")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 150, (90, 230, 210))
+    d = ImageDraw.Draw(img)
+    cx, cy = 320, 220
+    d.polygon([(cx, cy-90), (cx+90, cy+40), (cx-90, cy+40)], fill=(210, 180, 90))
+    d.rectangle([cx-30, cy-10, cx+30, cy+40], fill=(30, 60, 60))
+    d.polygon([(cx, cy-40), (cx+18, cy-10), (cx, cy+20), (cx-18, cy-10)], fill=(90, 230, 210))
+    f = font(26)
+    d.text((30, 30), "AZTEC GEMS", font=f, fill=(120, 235, 215))
+    save(img, "aztec-gems")
+
+def mayan_gold():
+    img = base_card("#241804", "#0d0a01")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 160, (230, 190, 90))
+    d = ImageDraw.Draw(img)
+    cx, cy = 320, 230
+    d.polygon([(cx, cy-100), (cx+100, cy+60), (cx-100, cy+60)], fill=(180, 140, 60))
+    d.polygon([(cx-60, cy+40), (cx-30, cy+40), (cx-30, cy+60), (cx-60, cy+60)], fill=(60, 40, 20))
+    d.polygon([(cx+10, cy+30), (cx+40, cy+30), (cx+40, cy+60), (cx+10, cy+60)], fill=(60, 40, 20))
+    d.ellipse([cx-16, cy-10, cx+16, cy+20], fill=(30, 20, 10))
+    f = font(26)
+    d.text((30, 30), "MAYAN GOLD", font=f, fill=(230, 200, 130))
+    save(img, "mayan-gold")
+
+def gold_888():
+    img = base_card("#2a0505", "#0d0101")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 160, (230, 190, 60), alpha=140)
+    d = ImageDraw.Draw(img)
+    f = font(80)
+    d.text((150, 170), "888", font=f, fill=(240, 200, 70))
+    f2 = font(26)
+    d.text((30, 30), "888 GOLD", font=f2, fill=(240, 200, 90))
+    save(img, "gold-888")
+
+def fire_strike():
+    img = base_card("#2a0808", "#0e0202")
+    d = ImageDraw.Draw(img)
+    radial_glow(img, (470, 100), 160, (255, 110, 30), alpha=150)
+    d = ImageDraw.Draw(img)
+    cx, cy = 320, 230
+    d.polygon([(cx, cy+80), (cx-50, cy), (cx-10, cy), (cx-30, cy-90), (cx+40, cy-10), (cx+10, cy-10), (cx+50, cy+80)], fill=(255, 130, 40))
+    d.polygon([(cx, cy+60), (cx-20, cy+10), (cx, cy+10), (cx-10, cy-40), (cx+22, cy+0), (cx+6, cy+0), (cx+24, cy+60)], fill=(255, 220, 90))
+    f = font(24)
+    d.text((30, 30), "FIRE STRIKE", font=f, fill=(255, 180, 110))
+    save(img, "fire-strike")
+
+for fn in [tajiri_fruits, fruit_mania, regal_fruits, hot_hot_fruit,
+           aztec_gems, mayan_gold, gold_888, fire_strike]:
+    fn()
+
 print("done")
