@@ -28,6 +28,24 @@ GAMES = [
     {'slug': 'fortune-tiger', 'name': 'Fortune Tiger', 'provider': 'PG Soft', 'initials': 'FT', 'color': '#0F2A28', 'category': 'slot', 'hot': False, 'image': 'fortune-tiger.png'},
     {'slug': 'book-of-dead', 'name': 'Book of Dead', 'provider': "Play'n GO", 'initials': 'BD', 'color': '#1F3D2E', 'category': 'slot', 'hot': False, 'image': 'book-of-dead.png'},
     {'slug': 'money-train-3', 'name': 'Money Train 3', 'provider': 'Relax Gaming', 'initials': 'MT', 'color': '#14211B', 'category': 'slot', 'hot': False, 'image': 'money-train-3.png'},
+
+    # ---- newer additions ----
+    {'slug': 'aero', 'name': 'Aero', 'provider': 'Onlyplay', 'initials': 'AE', 'color': '#3a1414', 'category': 'crash', 'hot': False, 'image': 'aero.png'},
+    {'slug': 'avrika', 'name': 'Avrika', 'provider': 'Onlyplay', 'initials': 'AV', 'color': '#160505', 'category': 'crash', 'hot': False, 'image': 'avrika.png'},
+    {'slug': 'chicken-panic', 'name': 'Chicken Panic', 'provider': 'InOut Games', 'initials': 'CP', 'color': '#2a1c0a', 'category': 'crash', 'hot': False, 'image': 'chicken-panic.png'},
+    {'slug': 'aviabet', 'name': 'AviaBet', 'provider': 'BGaming', 'initials': 'AB', 'color': '#3a0d24', 'category': 'crash', 'hot': False, 'image': 'aviabet.png'},
+    {'slug': 'crossfire-chicken', 'name': 'Crossfire Chicken', 'provider': 'InOut Games', 'initials': 'CF', 'color': '#2a0a0a', 'category': 'crash', 'hot': True, 'image': 'crossfire-chicken.png'},
+    {'slug': 'aviatrix', 'name': 'Aviatrix', 'provider': 'Aviatrix Gaming', 'initials': 'AX', 'color': '#0a1830', 'category': 'crash', 'hot': True, 'image': 'aviatrix.png'},
+    {'slug': 'crashx', 'name': 'CrashX', 'provider': 'BGaming', 'initials': 'CX', 'color': '#1c0505', 'category': 'crash', 'hot': False, 'image': 'crashx.png'},
+    {'slug': 'goalx', 'name': 'GoalX', 'provider': 'Onlyplay', 'initials': 'GX', 'color': '#0a2a12', 'category': 'crash', 'hot': False, 'image': 'goalx.png'},
+    {'slug': 'tajiri-fruits', 'name': 'Tajiri Fruits', 'provider': 'Summit Originals', 'initials': 'TF', 'color': '#3a1a06', 'category': 'slot', 'hot': False, 'image': 'tajiri-fruits.png'},
+    {'slug': 'fruit-mania', 'name': 'Fruit Mania', 'provider': 'Booongo', 'initials': 'FM', 'color': '#141033', 'category': 'slot', 'hot': False, 'image': 'fruit-mania.png'},
+    {'slug': 'regal-fruits', 'name': 'Regal Fruits 1000', 'provider': 'Booongo', 'initials': 'RF', 'color': '#2a1040', 'category': 'slot', 'hot': False, 'image': 'regal-fruits.png'},
+    {'slug': 'hot-hot-fruit', 'name': 'Hot Hot Fruit', 'provider': "Play'n GO", 'initials': 'HF', 'color': '#3a0a0a', 'category': 'slot', 'hot': True, 'image': 'hot-hot-fruit.png'},
+    {'slug': 'aztec-gems', 'name': 'Aztec Gems', 'provider': 'Pragmatic Play', 'initials': 'AG', 'color': '#062a2a', 'category': 'slot', 'hot': False, 'image': 'aztec-gems.png'},
+    {'slug': 'mayan-gold', 'name': 'Mayan Gold', 'provider': 'BGaming', 'initials': 'MG', 'color': '#241804', 'category': 'slot', 'hot': True, 'image': 'mayan-gold.png'},
+    {'slug': 'gold-888', 'name': '888 Gold', 'provider': "Play'n GO", 'initials': '888', 'color': '#2a0505', 'category': 'slot', 'hot': False, 'image': 'gold-888.png'},
+    {'slug': 'fire-strike', 'name': 'Fire Strike', 'provider': 'Pragmatic Play', 'initials': 'FS', 'color': '#2a0808', 'category': 'slot', 'hot': False, 'image': 'fire-strike.png'},
 ]
 
 
