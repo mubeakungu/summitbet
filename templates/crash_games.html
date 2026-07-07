@@ -78,8 +78,19 @@
     <div class="games-grid">
       {% for game in games %}
       <a href="{{ url_for('game_detail', slug=game.slug) }}" class="game-card" style="text-decoration:none; color:inherit; display:block;">
-        <div class="game-thumb" style="background:{{ game.color }};">
-          {{ game.initials }}
+        <div class="game-thumb" style="background:{{ game.color }}; position:relative; overflow:hidden;">
+          {% if game.image %}
+            <img src="{{ url_for('static', filename='img/games/' ~ game.image) }}"
+                 alt="{{ game.name }}"
+                 loading="lazy"
+                 style="width:100%; height:100%; object-fit:cover; display:block;"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; position:absolute; top:0; left:0;">
+              {{ game.initials }}
+            </div>
+          {% else %}
+            {{ game.initials }}
+          {% endif %}
           {% if game.hot %}<span class="hot">Hot</span>{% endif %}
         </div>
         <div class="game-meta">
