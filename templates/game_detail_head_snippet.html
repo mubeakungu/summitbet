@@ -1,0 +1,23 @@
+<!-- In game_detail.html, inside the .game-detail-head block, add a button
+     next to the title so players can jump to the real game once it's wired up: -->
+
+<div class="game-detail-head">
+  <div class="game-detail-icon" style="background:{{ game.color }}; position:relative; overflow:hidden;">
+    {% if game.image %}
+      <img src="{{ url_for('static', filename='img/games/' ~ game.image) }}"
+           alt="{{ game.name }}"
+           style="width:100%; height:100%; object-fit:cover; display:block;"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; position:absolute; top:0; left:0;">
+        {{ game.initials }}
+      </div>
+    {% else %}
+      {{ game.initials }}
+    {% endif %}
+  </div>
+  <div style="flex:1;">
+    <h1>{{ game.name }}</h1>
+    <div class="provider">{{ game.provider }} &middot; {{ 'Crash game' if game.category == 'crash' else 'Slot' }}</div>
+  </div>
+  <a href="{{ url_for('game_play', slug=game.slug) }}" class="btn btn-gold">Play live</a>
+</div>
