@@ -260,6 +260,49 @@ def wallet_withdraw():
     return redirect(url_for('wallet'))
 
 
+# Add near the top of app.py, alongside other imports:
+#
+#   from games_provider import launch_game, ProviderNotConfigured, ProviderError
+#
+# Add this route anywhere alongside game_detail():
+
+@app.route('/game/<slug>/play')
+def game_play(slug):
+    game = next((g for g in GAMES if g['slug'] == slug), None)
+    if not game:
+        return render_template('404.html', active_nav=None, user=session.get('user')), 404
+
+    if not session.get('user'):
+        flash('Please log in to play.', 'error')
+        return redirect(url_for('login'))
+
+    player_id = session['user']['username']  # TODO: swap for your real internal player id once auth is real
+
+    try:
+        result = launch_game(
+            slug=slug,
+            player_id=player_id,
+            player_currency='KES',
+            return_url=url_for('wallet', _external=True),
+        )
+    except ProviderNotConfigured:
+        # Not wired up yet — fall back to the existing decorative demo page
+        # instead of a broken/blank screen.
+        flash('Live game session isn\'t connected yet — showing the demo version.', 'success')
+        return redirect(url_for('game_detail', slug=slug))
+    except ProviderError as e:
+        flash(f'Could not start the game right now ({e}). Please try again shortly.', 'error')
+        return redirect(url_for('game_detail', slug=slug))
+
+    return render_template(
+        'game_play.html',
+        active_nav=game['category'] + '_games' if game['category'] == 'crash' else 'slots',
+        game=game,
+        game_url=result['game_url'],
+        user=session.get('user'),
+    )
+
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html', active_nav=None, user=session.get('user')), 404
